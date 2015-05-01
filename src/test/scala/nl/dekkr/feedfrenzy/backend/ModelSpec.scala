@@ -1,6 +1,6 @@
 package nl.dekkr.feedfrenzy.backend
 
-import nl.dekkr.pagefetcher.model.PageUrl
+import nl.dekkr.feedfrenzy.backend.model.PageUrl
 import org.specs2.mutable.Specification
 
 class ModelSpec extends Specification {
