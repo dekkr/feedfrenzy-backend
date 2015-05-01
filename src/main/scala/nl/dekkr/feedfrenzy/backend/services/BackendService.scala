@@ -11,13 +11,22 @@ class BackendService(pagefetcher_uri: String) extends BackendSystem {
   private val USER_AGENT: String = "feedfrenzy-backend"
   private val CHARSET: String = "UTF-8"
 
-  def getContent(request: PageUrl): BackendResult = {
+  def getArticles(request: PageUrl): BackendResult = {
       Try(this.pageContent(request.url).charset(CHARSET)) match {
         case Success(content) =>
           processRequest(request, content)
         case Failure(e) => Error(s"${e.getMessage}")
       }
   }
+
+  def getArticle(request: PageUrl): BackendResult = {
+    Try(this.pageContent(request.url).charset(CHARSET)) match {
+      case Success(content) =>
+        processRequest(request, content)
+      case Failure(e) => Error(s"${e.getMessage}")
+    }
+  }
+
 
   private def processRequest(request: PageUrl, content: Http.Request): BackendResult = {
       NewContent(content.asString)

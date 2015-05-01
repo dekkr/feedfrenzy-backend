@@ -5,6 +5,7 @@ import nl.dekkr.feedfrenzy.backend.model.{BackendResult, PageUrl}
 trait BackendSystem {
 
 
-  def getContent(request: PageUrl): BackendResult
+  def getArticles(request: PageUrl): BackendResult
+  def getArticle(request: PageUrl): BackendResult
 
 }
