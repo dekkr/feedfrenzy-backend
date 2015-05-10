@@ -1,78 +1,99 @@
 package nl.dekkr.feedfrenzy.backend.services
 
-import akka.http.model.HttpMethods._
-import akka.http.model.StatusCodes._
-import akka.http.model._
+import akka.actor.ActorSystem
+import akka.event.LoggingAdapter
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.client.RequestBuilding
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import akka.http.scaladsl.marshalling.ToResponseMarshallable
+import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.StatusCodes._
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.unmarshalling.Unmarshal
+import akka.stream.FlowMaterializer
+import akka.stream.scaladsl.{Flow, Sink, Source}
+import java.io.IOException
 import nl.dekkr.feedfrenzy.backend.model._
+import nl.dekkr.feedfrenzy.backend.util.ActionExecutor
 
-import scala.language.implicitConversions
+import scala.concurrent.{ExecutionContextExecutor, Future}
+import spray.json.DefaultJsonProtocol
 
-trait FrontendService {
-  implicit val backend: BackendSystem
+trait Protocols extends DefaultJsonProtocol {
+  implicit val action = jsonFormat6(Action.apply)
+  implicit val articleLinksRequest = jsonFormat2(ArticleLinksRequest.apply)
+  implicit val articleLinks = jsonFormat1(ArticleLinks.apply)
 
-  val requestHandler: HttpRequest => HttpResponse = {
-    case HttpRequest(GET, Uri.Path("/"), _, _, _) =>
-      HttpResponse(
-        entity = HttpEntity(MediaTypes.`text/html`,
-          <html>
-            <head>
-              <title>Feedfrenzy-backend by DekkR projects</title>
-            </head>
-            <body>
-              <h1>Feedfrenzy-backend</h1>
-              <p>Ready to serve.</p>
-            </body>
-          </html>.buildString(stripComments = true)
-        ))
+  implicit val newContent = jsonFormat1(NewContent.apply)
+}
 
-    case HttpRequest(GET, uri, _, _, _) if uri.path.startsWith(Uri.Path("/v1/articles")) =>
-      uri.query.get("url") match {
-        case Some(url) =>
-          try {
-            backend.getArticles(uri) match {
-              case NewContent(content) => HttpResponse(entity = HttpEntity(MediaTypes.`text/html`, content))
-              case Error(msg) => HttpResponse(BadRequest, entity = s"$msg")
-              case _ => HttpResponse(BadRequest, entity = s"Bad request")
-            }
-          }
-          catch {
-            case e: Exception => HttpResponse(BadRequest, entity = s"${e.getMessage}")
-          }
-        case None =>
-          HttpResponse(NotFound, entity = "Missing url!")
+trait FrontendService extends Protocols with Configuration {
+  implicit val system: ActorSystem
+
+  implicit def executor: ExecutionContextExecutor
+
+  implicit val materializer: FlowMaterializer
+
+  val logger: LoggingAdapter
+
+  lazy val pageFetcherFlow: Flow[HttpRequest, HttpResponse, Any] =
+    Http().outgoingConnection(PAGEFETCHER_INTERFACE, PAGEFETCHER_PORT)
+
+  def pageFetchRequest(request: HttpRequest): Future[HttpResponse] =
+    Source.single(request).via(pageFetcherFlow).runWith(Sink.head)
+
+  def fetchPage(url: String): Future[Either[String, String]] = {
+    pageFetchRequest(RequestBuilding.Get(s"$PAGEFETCHER_URI$url",HttpEntity(ContentTypes.`application/json`, ""))).flatMap { response =>
+      response.status match {
+        case OK =>  Unmarshal(response.entity).to[String].map(Right(_))
+        case BadRequest => Future.successful(Left(s"$url: incorrect url"))
+        case _ => Unmarshal(response.entity).to[String].flatMap { entity =>
+          val error = s"Pagefetcher request failed with status code ${response.status} and entity $entity"
+          logger.error(error)
+          Future.failed(new IOException(error))
+        }
       }
-
-    case HttpRequest(GET, uri, _, _, _) if uri.path.startsWith(Uri.Path("/v1/article")) =>
-      uri.query.get("url") match {
-        case Some(url) =>
-          try {
-            backend.getArticle(uri) match {
-              case NewContent(content) => HttpResponse(entity = HttpEntity(MediaTypes.`text/html`, content))
-              case Error(msg) => HttpResponse(BadRequest, entity = s"$msg")
-              case _ => HttpResponse(BadRequest, entity = s"Bad request")
-            }
-          }
-          catch {
-            case e: Exception => HttpResponse(BadRequest, entity = s"${e.getMessage}")
-          }
-        case None =>
-          HttpResponse(NotFound, entity = "Missing url!")
-      }
-
-    case _: HttpRequest =>
-      HttpResponse(NotFound, entity = "Unknown resource!")
+    }
   }
 
-  implicit def uri2PageUri(uri: Uri): PageUrl = {
-    val maxAge: Option[Int] = uri.query.get("maxAge") match {
-      case Some(value: String) => Some(value.toInt)
-      case None => Some(1440)
+  val routes = {
+    logRequestResult("feedfrenzy-backend-microservice") {
+      pathPrefix("v1") {
+        pathPrefix("createArticleLinks") {
+          (post & entity(as[ArticleLinksRequest])) { request =>
+            complete {
+              fetchPage(request.url).map[ToResponseMarshallable] {
+                case Right(content : String) =>
+                  val results = ActionExecutor.start(content,request.indexActions)
+                  ArticleLinks(results)
+                  //ArticleLinks(List(request.url, content))
+                case Left(errorMessage) => BadRequest -> errorMessage
+              }
+            }
+          }
+        }
+//        (get & path(Segment)) { ip =>
+//          complete {
+//            fetchIpInfo(ip).map[ToResponseMarshallable] {
+//              case Right(ipInfo) => ipInfo
+//              case Left(errorMessage) => BadRequest -> errorMessage
+//            }
+//          }
+//        } ~
+//        (post & entity(as[IpPairSummaryRequest])) { ipPairSummaryRequest =>
+//        complete {
+//          val ip1InfoFuture = fetchIpInfo(ipPairSummaryRequest.ip1)
+//          val ip2InfoFuture = fetchIpInfo(ipPairSummaryRequest.ip2)
+//          ip1InfoFuture.zip(ip2InfoFuture).map[ToResponseMarshallable] {
+//            case (Right(info1), Right(info2)) => IpPairSummary(info1, info2)
+//            case (Left(errorMessage), _) => BadRequest -> errorMessage
+//            case (_, Left(errorMessage)) => BadRequest -> errorMessage
+//          }
+//        }
+      }
     }
-    val raw: Option[Boolean] = uri.query.get("raw") match {
-      case Some(value: String) => Some(value.toBoolean)
-      case None => Some(false)
-    }
-    PageUrl(url = uri.query.get("url").getOrElse(""), maxAge = maxAge, raw = raw)
   }
+
+
 
 }

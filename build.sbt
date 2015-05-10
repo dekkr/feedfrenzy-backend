@@ -11,26 +11,27 @@ lazy val root = (project in file(".")).
   )
 
 libraryDependencies ++= {
-  val akkaV = "2.3.10"
-  val akkaStreamV = "1.0-M5"
-  val activateVersion = "1.7"
+  val akkaV       = "2.3.10"
+  val akkaStreamV = "1.0-RC2"
+  val scalaTestV  = "2.2.4"
   val scalaLoggingVersion = "3.1.0"
   val slf4jVersion = "1.7.10"
   val logbackVersion = "1.1.2"
   Seq(
-    "com.typesafe.akka" %% "akka-actor" % akkaV,
-    "com.typesafe.akka" %% "akka-testkit" % akkaV % "test",
-    "com.typesafe.akka" %% "akka-stream-experimental" % akkaStreamV,
-    "com.typesafe.akka" %% "akka-http-core-experimental" % akkaStreamV,
-    "com.typesafe.akka" %% "akka-http-experimental" % akkaStreamV,
-    "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaStreamV,
-    "com.typesafe.akka" %% "akka-http-testkit-experimental" % akkaStreamV % "test",
-    "commons-validator" % "commons-validator" % "1.4.1",
-    "org.scalaj" %% "scalaj-http" % "0.3.16",
-    "org.specs2" %% "specs2-core" % "2.3.13" % "test",
-    "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
-    "org.slf4j" % "slf4j-api" % slf4jVersion,
-    "ch.qos.logback" % "logback-classic" % logbackVersion
+    "com.typesafe.akka" %% "akka-actor"                           % akkaV,
+    "com.typesafe.akka" %% "akka-stream-experimental"             % akkaStreamV,
+    "com.typesafe.akka" %% "akka-http-core-experimental"          % akkaStreamV,
+    "com.typesafe.akka" %% "akka-http-scala-experimental"         % akkaStreamV,
+    "com.typesafe.akka" %% "akka-http-spray-json-experimental"    % akkaStreamV,
+    "com.typesafe.akka" %% "akka-http-testkit-scala-experimental" % akkaStreamV,
+    "org.scalatest"     %% "scalatest"                            % scalaTestV % "test",
+    "commons-validator" % "commons-validator"                     % "1.4.1",
+    "org.jsoup"         % "jsoup"                                 % "1.7.2",
+    "org.scalaj"        %% "scalaj-http"                          % "0.3.16",
+    "org.specs2"        %% "specs2-core"                          % "2.3.13" % "test",
+    "com.typesafe.scala-logging" %% "scala-logging"               % scalaLoggingVersion,
+    "org.slf4j"         % "slf4j-api"                             % slf4jVersion,
+    "ch.qos.logback"    % "logback-classic"                       % logbackVersion
   )
 }
 
