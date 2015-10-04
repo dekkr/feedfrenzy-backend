@@ -64,32 +64,12 @@ trait FrontendService extends Protocols with Configuration {
             complete {
               fetchPage(request.url).map[ToResponseMarshallable] {
                 case Right(content : String) =>
-                  val results = ActionExecutor.start(content,request.indexActions)
-                  ArticleLinks(results)
-                  //ArticleLinks(List(request.url, content))
+                  ArticleLinks(new ActionExecutor().start(content,request.indexActions))
                 case Left(errorMessage) => BadRequest -> errorMessage
               }
             }
           }
         }
-//        (get & path(Segment)) { ip =>
-//          complete {
-//            fetchIpInfo(ip).map[ToResponseMarshallable] {
-//              case Right(ipInfo) => ipInfo
-//              case Left(errorMessage) => BadRequest -> errorMessage
-//            }
-//          }
-//        } ~
-//        (post & entity(as[IpPairSummaryRequest])) { ipPairSummaryRequest =>
-//        complete {
-//          val ip1InfoFuture = fetchIpInfo(ipPairSummaryRequest.ip1)
-//          val ip2InfoFuture = fetchIpInfo(ipPairSummaryRequest.ip2)
-//          ip1InfoFuture.zip(ip2InfoFuture).map[ToResponseMarshallable] {
-//            case (Right(info1), Right(info2)) => IpPairSummary(info1, info2)
-//            case (Left(errorMessage), _) => BadRequest -> errorMessage
-//            case (_, Left(errorMessage)) => BadRequest -> errorMessage
-//          }
-//        }
       }
     }
   }

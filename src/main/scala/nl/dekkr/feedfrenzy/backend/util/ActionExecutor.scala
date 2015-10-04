@@ -2,15 +2,20 @@ package nl.dekkr.feedfrenzy.backend.util
 
 import java.util.regex.{Matcher, Pattern}
 
+import akka.event.LoggingAdapter
+import com.typesafe.scalalogging.Logger
 import nl.dekkr.feedfrenzy.backend.model._
 import org.jsoup.Jsoup
+import org.slf4j.LoggerFactory
 
 import scala.language.implicitConversions
 import scala.collection.JavaConversions._
 
-object ActionExecutor {
+class ActionExecutor {
 
   private final val inputVar: String = "-->Input"
+
+  private val logger = Logger(LoggerFactory.getLogger("[ActionExecutor]"))
 
   def start(input: String, actions: List[Action]): List[String] =
     getVariable(Some(inputVar), doActions(Map(inputVar -> List(input)),actions.sortBy(a => a.order)))
@@ -23,7 +28,7 @@ object ActionExecutor {
       doActions(performSingleAction(actions.head, input), actions.tail)
   }
 
-  implicit def action2ActionType(action: Action): ActionType = {
+  implicit private def action2ActionType(action: Action): ActionType = {
     action.actionType.toLowerCase match {
       case "css-selector" => CssSelector(action.inputVariable, action.outputVariable, selectorPattern = action.template.get)
       case "css-remove" => CssSelectorRemove(action.inputVariable, action.outputVariable, selectorPattern = action.template.get)
@@ -38,8 +43,7 @@ object ActionExecutor {
   }
 
 
-  def performSingleAction(action: Action, vars: Map[String, List[String]]): Map[String, List[String]] = {
-
+  private def performSingleAction(action: Action, vars: Map[String, List[String]]): Map[String, List[String]] = {
 
     val output: List[String] = action2ActionType(action) match {
       case a: Regex =>
@@ -47,7 +51,7 @@ object ActionExecutor {
 
       case a: Split =>
         val inputList = getVariable(a.inputVariable, vars)
-        val input = if (inputList.size > 0) inputList.head else ""
+        val input = if (inputList.nonEmpty) inputList.head else ""
         split(input, a.selectorPattern)
 
       case a: CssSelector =>
@@ -77,10 +81,10 @@ object ActionExecutor {
         // TODO log error
         List("-- actionType not implemented --")
     }
-    println("################### output #######################")
-    println(output)
-    println("******************* vars *************************")
-    println(vars)
+    logger.debug("################### output #######################")
+    logger.debug(s"$output")
+    logger.debug("******************* vars *************************")
+    logger.debug(s"$vars")
 
     vars.filter(v => v._1.ne(action.outputVariable.getOrElse(inputVar))) + (action.outputVariable.getOrElse(inputVar) -> output)
   }
@@ -92,10 +96,10 @@ object ActionExecutor {
   private def split(content: String, selector: String) : List[String] = {
     try {
       val blockList = Jsoup.parse(content).select(selector).iterator.toList
-      for { element <- blockList } yield element.parent().html()
+      blockList map { _.parent().html() }
     } catch {
       case e: Exception =>
-        println(e.getMessage)
+        logger.debug(s"split: ${e.getMessage}")
         List.empty[String]
     }
   }
@@ -130,7 +134,7 @@ object ActionExecutor {
           //val doc = Jsoup.parse("<html></html").html(input)
           val updatedTemplate: String = replaceVarsInTemplate(template, vars)
           if (updatedTemplate.isEmpty) {
-            println(s"Empty string - $template")
+            logger.debug(s"Empty string - $template")
             ""
           } else {
             val contentList = doc.select(updatedTemplate)
@@ -180,7 +184,7 @@ object ActionExecutor {
           Jsoup.parse("<html></html").html(input).child(0).attr(attrib)
         } catch {
           case e: Exception =>
-            // TODO log an error: Attibute not found or empty input
+            // TODO log an error: Attribute not found or empty input
             ""
         }
 

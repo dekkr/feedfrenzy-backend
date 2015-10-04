@@ -19,7 +19,7 @@ object Boot extends App with BootedCore with CoreActors with FrontendService {
   override implicit val executor = system.dispatcher
   override implicit val materializer = ActorFlowMaterializer()
 
-  Http().bindAndHandle(routes,interface = API_INTERFACE, port = API_PORT
-  )
-
+  logger.info("Starting REST API...")
+  Http().bindAndHandle(routes,interface = API_INTERFACE, port = API_PORT)
+  logger.info("Ready")
 }

@@ -3,7 +3,7 @@ package nl.dekkr.feedfrenzy.backend.services
 import nl.dekkr.feedfrenzy.backend.model._
 
 import scala.util.{Failure, Success, Try}
-import scalaj.http.Http
+import scalaj.http.{HttpRequest, Http}
 
 class BackendService(pagefetcher_uri: String) extends BackendSystem {
 
@@ -28,8 +28,8 @@ class BackendService(pagefetcher_uri: String) extends BackendSystem {
   }
 
 
-  private def processRequest(request: PageUrl, content: Http.Request): BackendResult = {
-      NewContent(content.asString)
+  private def processRequest(request: PageUrl, content: HttpRequest): BackendResult = {
+      NewContent(content.asString.body)
   }
 
   private def pageContent(uri: String) = Http(pagefetcher_uri + uri).header("User-Agent", USER_AGENT)
