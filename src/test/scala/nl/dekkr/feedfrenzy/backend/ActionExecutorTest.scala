@@ -10,7 +10,7 @@ class ActionExecutorTest extends FlatSpecLike {
   val AE = new ActionExecutor()
 
   val actionSplit = Action(order = 1, actionType = "split", inputVariable = None, outputVariable = Option("anchor"), template = Some("li.tour-of-scala > a"), replaceWith = None)
-  val actionSplitDA = Action(order = 1, actionType = "split", inputVariable = None, outputVariable = Option("anchor"), template = Some("div.frame_buy > a"), replaceWith = None)
+  val actionSplitDA = Action(order = 1, actionType = "split", inputVariable = None, outputVariable = None, template = Some("div.deal-container >div.frame"), replaceWith = None)
 
   val actionAttribute = Action(order = 2, actionType = "attribute", inputVariable = Option("anchor"), outputVariable = None, template = Some("href"), replaceWith = None)
 
@@ -38,13 +38,13 @@ class ActionExecutorTest extends FlatSpecLike {
     assert(attributed.isEmpty)
   }
 
-  it should "succeed on a split / attribute sequence for DA" in {
+  it should "succeed on a split DA" in {
     val content = getFileAsString("dagartikel.html")
 
-    val attributed = AE.start(content, List(actionSplitDA, actionAttribute))
+    val attributed = AE.start(content, List(actionSplitDA))
     assert(attributed.length == 128)
     attributed.foreach(println)
-    attributed.foreach(a => assert(a.startsWith("http://")))
+    attributed.foreach(a => assert(a.startsWith("<div class=\"frame\">")))
   }
 
 
