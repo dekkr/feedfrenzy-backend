@@ -2,31 +2,30 @@ package nl.dekkr.feedfrenzy.backend.util
 
 import java.util.regex.{Matcher, Pattern}
 
-import akka.event.LoggingAdapter
 import com.typesafe.scalalogging.Logger
 import nl.dekkr.feedfrenzy.backend.model._
 import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
 
-import scala.language.implicitConversions
 import scala.collection.JavaConversions._
+import scala.language.implicitConversions
 
-class ActionExecutor {
+trait ActionExecutor {
 
-  private final val inputVar: String = "-->Input"
+  protected final val inputVar: String = "-->Input"
 
-  private val logger = Logger(LoggerFactory.getLogger("[ActionExecutor]"))
+  protected val logger = Logger(LoggerFactory.getLogger("[ActionExecutor]"))
 
-  def start(input: String, actions: List[Action]): List[String] =
-    getVariable(Some(inputVar), doActions(Map(inputVar -> List(input)),actions.sortBy(a => a.order)))
-
-
-  private def doActions(input: Map[String, List[String]], actions: List[Action]): Map[String, List[String]] = {
+  protected def doActions(input: Map[String, List[String]], actions: List[Action]): Map[String, List[String]] = {
     if (actions.isEmpty)
       input
     else
       doActions(performSingleAction(actions.head, input), actions.tail)
   }
+
+  protected def getVariable(key: Option[String], vars: Map[String, List[String]]): List[String] =
+    vars.getOrElse(key.getOrElse(inputVar), List.empty)
+
 
   implicit private def action2ActionType(action: Action): ActionType = {
     action.actionType.toLowerCase match {
@@ -90,13 +89,12 @@ class ActionExecutor {
   }
 
 
-  private def getVariable(key: Option[String], vars: Map[String, List[String]]): List[String] =
-    vars.getOrElse(key.getOrElse(inputVar), List.empty)
-
-  private def split(content: String, selector: String) : List[String] = {
+  private def split(content: String, selector: String): List[String] = {
     try {
       val blockList = Jsoup.parse(content).select(selector).iterator.toList
-      blockList map { _.parent().html() }
+      blockList map {
+        _.parent().html()
+      }
     } catch {
       case e: Exception =>
         logger.debug(s"split: ${e.getMessage}")
@@ -192,12 +190,12 @@ class ActionExecutor {
     } yield output
   }
 
- private def applyTemplate(key: String, values: List[String], template : String) : List[String] = {
-   for {
-     value <- values
-     output = template.replaceAllLiterally(s"{$key}", value)
-   } yield output
- }
+  private def applyTemplate(key: String, values: List[String], template: String): List[String] = {
+    for {
+      value <- values
+      output = template.replaceAllLiterally(s"{$key}", value)
+    } yield output
+  }
 
 
   private def replaceVarsInTemplate(template: String, vars: Map[String, List[String]]): String = {

@@ -1,5 +1,5 @@
 package nl.dekkr.feedfrenzy.backend.model
 
-case class ArticleLinksRequest(url: String, indexActions: List[Action])
+case class ArticleLinksRequest(url: String, actions: List[Action])
 
 
