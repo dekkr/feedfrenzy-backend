@@ -12,7 +12,7 @@ import scala.language.implicitConversions
 
 trait ActionExecutor {
 
-  protected final val inputVar: String = "-->Input"
+  protected final val inputVar: String = "-->Input<--"
 
   protected val logger = Logger(LoggerFactory.getLogger("[ActionExecutor]"))
 
@@ -22,6 +22,9 @@ trait ActionExecutor {
     else
       doActions(performSingleAction(actions.head, input), actions.tail)
   }
+
+  protected def map2Raw(input: String, vars: Map[String, List[String]]) =
+    RawVariables(vars.filter(_._1 != inputVar).map(v => RawVariable(v._1, v._2)).toList, input)
 
   protected def getVariable(key: Option[String], vars: Map[String, List[String]]): List[String] =
     vars.getOrElse(key.getOrElse(inputVar), List.empty)
@@ -80,11 +83,6 @@ trait ActionExecutor {
         // TODO log error
         List("-- actionType not implemented --")
     }
-    logger.debug("################### output #######################")
-    logger.debug(s"$output")
-    logger.debug("******************* vars *************************")
-    logger.debug(s"$vars")
-
     vars.filter(v => v._1.ne(action.outputVariable.getOrElse(inputVar))) + (action.outputVariable.getOrElse(inputVar) -> output)
   }
 
@@ -185,7 +183,6 @@ trait ActionExecutor {
             // TODO log an error: Attribute not found or empty input
             ""
         }
-
       }
     } yield output
   }
@@ -201,8 +198,7 @@ trait ActionExecutor {
   private def replaceVarsInTemplate(template: String, vars: Map[String, List[String]]): String = {
     var output = template
     for (item <- vars) {
-      //println(s"$output ::: ${item._1} :::  ${item._2}")
-      output = output.replaceAllLiterally(s"{${item._1}}", if (item._2.size > 0) item._2.head else "")
+      output = output.replaceAllLiterally(s"{${item._1}}", if (item._2.nonEmpty) item._2.head else "")
     }
     output
   }

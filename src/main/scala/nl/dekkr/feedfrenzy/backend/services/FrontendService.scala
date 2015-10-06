@@ -22,11 +22,12 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 
 trait Protocols extends DefaultJsonProtocol {
   implicit val action = jsonFormat6(Action.apply)
-  implicit val articleLinksRequest = jsonFormat2(ArticleLinksRequest.apply)
-  implicit val articleRequest = jsonFormat2(ArticleRequest.apply)
+  implicit val articleLinksRequest = jsonFormat3(ArticleLinksRequest.apply)
+  implicit val articleRequest = jsonFormat3(ArticleRequest.apply)
   implicit val articleLinks = jsonFormat1(ArticleLinks.apply)
   implicit val article = jsonFormat4(Article.apply)
-
+  implicit val rawVariable = jsonFormat2(RawVariable.apply)
+  implicit val rawVariables = jsonFormat2(RawVariables.apply)
   implicit val newContent = jsonFormat1(NewContent.apply)
 }
 
@@ -45,7 +46,10 @@ trait FrontendService extends Protocols with Configuration {
             complete {
               fetchPage(request.url).map[ToResponseMarshallable] {
                 case Right(content : String) =>
+                if (request.raw.isEmpty || request.raw.contains(false))
                   new ArticleLinksExtractor().getList(content,request.actions)
+                  else
+                  new ArticleLinksExtractor().getRaw(content,request.actions)
                 case Left(errorMessage) => BadRequest -> errorMessage
               }
             }
@@ -56,7 +60,10 @@ trait FrontendService extends Protocols with Configuration {
             complete {
               fetchPage(request.url).map[ToResponseMarshallable] {
                 case Right(content : String) =>
+                if (request.raw.isEmpty || request.raw.contains(false))
                   new ArticleExtractor().getArticle(request.url,content,request.actions)
+                  else
+                  new ArticleExtractor().getRaw(request.url,content,request.actions)
                 case Left(errorMessage) => BadRequest -> errorMessage
               }
             }
