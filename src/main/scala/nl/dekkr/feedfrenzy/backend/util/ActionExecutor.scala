@@ -12,21 +12,22 @@ import scala.language.implicitConversions
 
 trait ActionExecutor {
 
+  type VariableMap = Map[String, List[String]]
+
   protected final val inputVar: String = "-->Input<--"
 
   protected val logger = Logger(LoggerFactory.getLogger("[ActionExecutor]"))
 
-  protected def doActions(input: Map[String, List[String]], actions: List[Action]): Map[String, List[String]] = {
-    if (actions.isEmpty)
-      input
-    else
+  protected def doActions(input: VariableMap, actions: List[Action]): VariableMap =
+    if (actions.nonEmpty)
       doActions(performSingleAction(actions.head, input), actions.tail)
-  }
+    else
+      input
 
-  protected def map2Raw(input: String, vars: Map[String, List[String]]) =
+  protected def map2Raw(input: String, vars: VariableMap) =
     RawVariables(vars.filter(_._1 != inputVar).map(v => RawVariable(v._1, v._2)).toList, input)
 
-  protected def getVariable(key: Option[String], vars: Map[String, List[String]]): List[String] =
+  protected def getVariable(key: Option[String], vars: VariableMap): List[String] =
     vars.getOrElse(key.getOrElse(inputVar), List.empty)
 
 
@@ -45,16 +46,14 @@ trait ActionExecutor {
   }
 
 
-  private def performSingleAction(action: Action, vars: Map[String, List[String]]): Map[String, List[String]] = {
+  private def performSingleAction(action: Action, vars: VariableMap): VariableMap = {
 
     val output: List[String] = action2ActionType(action) match {
       case a: Regex =>
         extractWithRegEx(getVariable(a.inputVariable, vars), a)
 
       case a: Split =>
-        val inputList = getVariable(a.inputVariable, vars)
-        val input = if (inputList.nonEmpty) inputList.head else ""
-        split(input, a.selectorPattern)
+        getVariable(a.inputVariable, vars).flatMap(input => split(input, a.selectorPattern))
 
       case a: CssSelector =>
         extractWithCssSelector(getVariable(a.inputVariable, vars), a.selectorPattern, vars, includeParentHtml = false)
@@ -70,14 +69,10 @@ trait ActionExecutor {
 
       case a: Template =>
         List(replaceVarsInTemplate(a.template, vars))
-      //println(s"TEMPLATE [$template] [$output]")
 
-      case a: Replace =>
-        for {
-          input <- getVariable(a.inputVariable, vars)
-          updated = input.replaceAllLiterally(replaceVarsInTemplate(a.find, vars), replaceVarsInTemplate(a.replaceWith, vars))
-        } yield updated
-
+      case a: Replace => getVariable(a.inputVariable, vars).map(input =>
+          input.replaceAllLiterally(replaceVarsInTemplate(a.find, vars), replaceVarsInTemplate(a.replaceWith, vars))
+        )
 
       case _ =>
         // TODO log error
@@ -89,10 +84,7 @@ trait ActionExecutor {
 
   private def split(content: String, selector: String): List[String] = {
     try {
-      val blockList = Jsoup.parse(content).select(selector).iterator.toList
-      blockList map {
-        _.parent().html()
-      }
+      Jsoup.parse(content).select(selector).iterator.toList map {_.parent().html()}
     } catch {
       case e: Exception =>
         logger.debug(s"split: ${e.getMessage}")
@@ -101,55 +93,49 @@ trait ActionExecutor {
   }
 
 
-  private def removeWithCssSelector(inputList: List[String], template: String, vars: Map[String, List[String]]): List[String] = {
-    for {
-      input <- inputList
-      output = {
+  private def removeWithCssSelector(inputList: List[String], template: String, vars:VariableMap): List[String] =
+    inputList.map( input => {
         if (input != null && input.length > 0) {
           val doc = Jsoup.parse(input)
-          val removeThisContent = doc.select(replaceVarsInTemplate(template, vars)).first
-          if (removeThisContent != null) {
-            doc.body.html.replaceAllLiterally(removeThisContent.outerHtml(), "")
-          } else {
-            input
+          doc.select(replaceVarsInTemplate(template, vars)).first  match {
+            case removeThisContent if removeThisContent != null =>
+              doc.body.html.replaceAllLiterally(removeThisContent.outerHtml(), "")
+            case _ => input
           }
         } else {
           ""
         }
       }
-    } yield output
+    )
+
+
+  private def extractWithCssSelector(inputList: List[String], template: String, vars: VariableMap, includeParentHtml: Boolean): List[String] = {
+    replaceVarsInTemplate(template, vars) match {
+      case updatedTemplate: String if updatedTemplate.nonEmpty =>
+        inputList.flatMap(input => extractCss(input, updatedTemplate, includeParentHtml))
+      case updatedTemplate: String =>
+        logger.debug(s"Empty string - $template")
+        List.empty[String]
+    }
   }
 
-
-  private def extractWithCssSelector(inputList: List[String], template: String, vars: Map[String, List[String]], includeParentHtml: Boolean): List[String] = {
-    for {
-      input <- inputList
-      output = {
-        if (input != null && input.length > 0) {
-          val doc = Jsoup.parse(input)
-          //val doc = Jsoup.parse("<html></html").html(input)
-          val updatedTemplate: String = replaceVarsInTemplate(template, vars)
-          if (updatedTemplate.isEmpty) {
-            logger.debug(s"Empty string - $template")
-            ""
+  private def extractCss(input: String, updatedTemplate: String, includeParentHtml: Boolean): List[String] = {
+    if (input != null && input.length > 0) {
+      Jsoup.parse(input).select(updatedTemplate) match {
+        case contentList if contentList != null =>
+          if (includeParentHtml) {
+            contentList.map(_.outerHtml()).toList
           } else {
-            val contentList = doc.select(updatedTemplate)
-            if (contentList != null) {
-              if (includeParentHtml) {
-                contentList.outerHtml()
-              } else {
-                contentList.html()
-              }
-            } else {
-              ""
-            }
+            contentList.map(_.html()).toList
           }
-        } else {
-          ""
-        }
+        case _ => List.empty[String]
       }
-    } yield output
+    } else {
+      List.empty[String]
+    }
+
   }
+
 
   private def extractWithRegEx(inputVar: List[String], a: Regex): List[String] = {
     try {
@@ -173,29 +159,18 @@ trait ActionExecutor {
 
 
   private def extractAttribute(inputList: List[String], attrib: String): List[String] = {
-    for {
-      input <- inputList
-      output = {
-        try {
-          Jsoup.parse("<html></html").html(input).child(0).attr(attrib)
-        } catch {
-          case e: Exception =>
-            // TODO log an error: Attribute not found or empty input
-            ""
-        }
+    inputList.map(input =>
+      try {
+        Jsoup.parse("<html></html").html(input).child(0).attr(attrib)
+      } catch {
+        case e: Exception =>
+          // TODO log an error: Attribute not found or empty input
+          ""
       }
-    } yield output
+    )
   }
 
-  private def applyTemplate(key: String, values: List[String], template: String): List[String] = {
-    for {
-      value <- values
-      output = template.replaceAllLiterally(s"{$key}", value)
-    } yield output
-  }
-
-
-  private def replaceVarsInTemplate(template: String, vars: Map[String, List[String]]): String = {
+  private def replaceVarsInTemplate(template: String, vars: VariableMap): String = {
     var output = template
     for (item <- vars) {
       output = output.replaceAllLiterally(s"{${item._1}}", if (item._2.nonEmpty) item._2.head else "")
