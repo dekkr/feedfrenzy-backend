@@ -15,7 +15,8 @@ class ArticleExtractor extends ActionExecutor {
       uid = getVariable(Some("uid"), vars).headOption.getOrElse(""),
       title = getVariable(Some("title"), vars).headOption.getOrElse(""),
       author = getVariable(Some("author"), vars).headOption,
-      content = getVariable(Some("content"), vars).headOption.getOrElse("")
+      content = getVariable(Some("content"), vars).headOption.getOrElse(""),
+      tags = getVariable(Some("tags"), vars)
     )
   }
 
