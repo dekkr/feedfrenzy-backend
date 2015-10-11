@@ -1,0 +1,17 @@
+{
+  "url": "https://www.eff.org/deeplinks",
+  "actions": [
+    {
+      "order": 1,
+      "actionType": "split",
+      "template": "div.views-field-view-node > span.field-content > a",
+      "outputVariable": "anchor"
+    },
+    {
+      "order": 2,
+      "actionType": "attribute",
+      "inputVariable": "anchor",
+      "template": "href"
+    }
+  ]
+}
