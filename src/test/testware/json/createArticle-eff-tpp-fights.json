@@ -1,5 +1,6 @@
 {
     "url": "https://www.eff.org/deeplinks/2015/10/trade-officials-announce-conclusion-tpp-now-real-fight-begins",
+     "raw" : true,
      "actions": [
          {
              "order": 1,
@@ -31,6 +32,13 @@
              "actionType": "css-selector",
              "template": "div.field-type-taxonomy-term-reference > div > div > a",
              "outputVariable": "tags"
+         },
+         {
+           "order": 6,
+           "actionType": "date-regex",
+           "template": "(?<month>\\w+)\\s(?<day>\\d+),\\s(?<year>\\d+)",
+           "inputVariable": "dateauthor",
+           "outputVariable": "date"
          }
      ]
  }

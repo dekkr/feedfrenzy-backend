@@ -13,6 +13,8 @@ sealed trait ActionType { }
 
   case class Regex(inputVariable: Option[String], outputVariable: Option[String], regex: String) extends ActionType
 
+  case class DateRegex(inputVariable: Option[String], outputVariable: Option[String], regex: String) extends ActionType
+
   case class Template(outputVariable: Option[String], template: String) extends ActionType
 
   case class Replace(inputVariable: Option[String], outputVariable: Option[String], find: String, replaceWith: String) extends ActionType

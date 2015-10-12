@@ -39,6 +39,7 @@ trait ActionExecutor {
       case "attribute" => Attribute(action.inputVariable, action.outputVariable, attribute = action.template.get)
       case "template" => Template(action.outputVariable, template = action.template.get)
       case "regex" => Regex(action.inputVariable, action.outputVariable, regex = action.template.get)
+      case "date-regex" => DateRegex(action.inputVariable, action.outputVariable, regex = action.template.get)
       case "replace" => Replace(action.inputVariable, action.outputVariable, find = action.template.get, replaceWith = action.replaceWith.get)
       case "split" => Split(action.inputVariable, action.outputVariable, selectorPattern = action.template.get)
       case _ => throw new NoSuchMethodException
@@ -51,6 +52,9 @@ trait ActionExecutor {
     val output: List[String] = action2ActionType(action) match {
       case a: Regex =>
         extractWithRegEx(getVariable(a.inputVariable, vars), a)
+
+      case a: DateRegex =>
+        extractDateWithRegEx(getVariable(a.inputVariable, vars), a)
 
       case a: Split =>
         getVariable(a.inputVariable, vars).flatMap(input => split(input, a.selectorPattern))
@@ -137,25 +141,30 @@ trait ActionExecutor {
   }
 
 
-  private def extractWithRegEx(inputVar: List[String], a: Regex): List[String] = {
-    try {
-      val p: Pattern = Pattern.compile(a.regex)
-      for {
-        input <- inputVar
-        m: Matcher = p.matcher(input)
-        result = if (m.find) {
-          m.group(1)
-        } else {
-          ""
+  private def extractWithRegEx(inputVar: List[String], a: Regex): List[String] =
+    inputVar map { input =>
+      a.regex.r.findFirstMatchIn(input) match {
+        case Some(found) => found.matched
+        case None => ""
+      }
+    }
+
+  private def extractDateWithRegEx(inputVar: List[String], a: DateRegex): List[String] =
+    inputVar map { input =>
+        a.regex.r.findFirstMatchIn(input) match {
+          case Some(found) =>  found.matched
+          case None => ""
         }
-      } yield result
-    }
-    catch {
-      case e: Exception =>
-        // TODO log exception
-        List.empty
-    }
+      }
+
+
+
+  def findGroupingNamesInRegEx(regex: String) : List[String] = {
+    //TODO implement this
+    """\?\<(\w+)\>""".r.findAllIn(regex).matchData.map(_.matched).toList
+    List("year","day","month")
   }
+
 
 
   private def extractAttribute(inputList: List[String], attrib: String): List[String] = {

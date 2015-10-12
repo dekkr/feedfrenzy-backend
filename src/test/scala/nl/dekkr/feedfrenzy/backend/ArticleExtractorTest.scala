@@ -23,6 +23,14 @@ class ArticleExtractorTest extends FlatSpecLike {
     assert(article.title == "Trade Officials Announce Conclusion of TPP—Now the Real Fight Begins")
   }
 
+  it should "find grouping names" in {
+    val names = AE.findGroupingNamesInRegEx("(?<month>\\w+)\\s(?<day>\\d+),\\s(?<year>\\d+)")
+    assert(names.head == "month")
+    assert(names.tail.head == "day")
+    assert(names.last == "year")
+
+  }
+
 
   def getFileAsString(fileName: String): String = {
     val file = io.Source.fromFile(s"./src/test/testware/pages/$fileName")
