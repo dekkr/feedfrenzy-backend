@@ -152,18 +152,20 @@ trait ActionExecutor {
   private def extractDateWithRegEx(inputVar: List[String], a: DateRegex): List[String] =
     inputVar map { input =>
         a.regex.r.findFirstMatchIn(input) match {
-          case Some(found) =>  found.matched
+          case Some(found) =>
+              findGroupingNamesInRegEx(a.regex).zip(found.subgroups)
+                .map{ case (group,value) => s"$group = $value" }
+                .mkString(", ")
+
           case None => ""
         }
       }
 
+  def findGroupingNamesInRegEx(regex: String) : Seq[String] =
+    """\?\<(\w+)\>""".r.findAllIn(regex).matchData
+      .map(_.matched).flatMap("""\w+""".r.findFirstIn(_)).toSeq
 
 
-  def findGroupingNamesInRegEx(regex: String) : List[String] = {
-    //TODO implement this
-    """\?\<(\w+)\>""".r.findAllIn(regex).matchData.map(_.matched).toList
-    List("year","day","month")
-  }
 
 
 
