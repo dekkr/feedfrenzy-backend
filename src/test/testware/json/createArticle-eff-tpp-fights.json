@@ -1,44 +1,53 @@
 {
-    "url": "https://www.eff.org/deeplinks/2015/10/trade-officials-announce-conclusion-tpp-now-real-fight-begins",
-     "raw" : true,
-     "actions": [
-         {
-             "order": 1,
-             "actionType": "css-selector",
-             "template": "div.dateauthor",
-             "outputVariable": "dateauthor"
-         },
-         {
-             "order": 2,
-             "actionType": "css-selector",
-             "template": "h2.node-title",
-             "outputVariable": "title"
-         },
-         {
-             "order": 3,
-             "actionType": "template",
-             "template": "Example content: {dateauthor}",
-             "outputVariable": "content"
-         },
-         {
-             "order": 4,
-             "actionType": "css-selector",
-             "template": "a",
-             "inputVariable": "dateauthor",
-             "outputVariable": "author"
-         },
-         {
-             "order": 5,
-             "actionType": "css-selector",
-             "template": "div.field-type-taxonomy-term-reference > div > div > a",
-             "outputVariable": "tags"
-         },
-         {
-           "order": 6,
-           "actionType": "date-regex",
-           "template": "(?<month>\\w+)\\s(?<day>\\d+),\\s(?<year>\\d+)",
-           "inputVariable": "dateauthor",
-           "outputVariable": "date"
-         }
-     ]
- }
+  "url": "https://www.eff.org/deeplinks/2015/10/trade-officials-announce-conclusion-tpp-now-real-fight-begins",
+  "raw": true,
+  "actions": [
+    {
+      "order": 1,
+      "actionType": "css-selector",
+      "template": "div.dateauthor",
+      "outputVariable": "dateauthor"
+    },
+    {
+      "order": 2,
+      "actionType": "css-selector",
+      "template": "h2.node-title",
+      "outputVariable": "title"
+    },
+    {
+      "order": 3,
+      "actionType": "template",
+      "template": "Example content: {dateauthor}",
+      "outputVariable": "content"
+    },
+    {
+      "order": 4,
+      "actionType": "css-selector",
+      "template": "a",
+      "inputVariable": "dateauthor",
+      "outputVariable": "author"
+    },
+    {
+      "order": 5,
+      "actionType": "css-selector",
+      "template": "div.field-type-taxonomy-term-reference > div > div > a",
+      "outputVariable": "tags"
+    },
+    {
+      "order": 6,
+      "actionType": "regex",
+      "template": "(?<month>\\w+)\\s(?<day>\\d+),\\s(?<year>\\d+)",
+      "inputVariable": "dateauthor",
+      "outputVariable": "dateString"
+    },
+    {
+      "order": 7,
+      "actionType": "date-parser",
+      "locale": "en",
+      "pattern": "MMMM d, yyyy",
+      "padTime": false,
+      "inputVariable": "dateString",
+      "outputVariable": "createdDate"
+    }
+  ]
+}

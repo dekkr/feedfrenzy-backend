@@ -8,4 +8,10 @@ case class Action(order: Int,
                   inputVariable: Option[String],
                   outputVariable: Option[String],
                   template: Option[String],
-                  replaceWith: Option[String])
+                 // Only used by the Replace Action
+                  replaceWith: Option[String],
+                  // Only for DateParse action
+                  locale: Option[String],
+                  pattern: Option[String],
+                  padTime: Option[Boolean]
+                   )

@@ -1,7 +1,7 @@
 package nl.dekkr.feedfrenzy.backend
 
+import nl.dekkr.feedfrenzy.backend.extractor.ArticleExtractor
 import nl.dekkr.feedfrenzy.backend.model.Action
-import nl.dekkr.feedfrenzy.backend.util.ArticleExtractor
 import org.scalatest.FlatSpecLike
 
 
@@ -9,9 +9,9 @@ class ArticleExtractorTest extends FlatSpecLike {
 
   val AE = new ArticleExtractor()
 
-  val dateAuthorAction = Action(order = 1, actionType = "css-selector", inputVariable = None, outputVariable = Option("dateauthor"), template = Some("div.dateauthor"), replaceWith = None)
-  val titleAction = Action(order = 2, actionType = "css-selector", inputVariable = None, outputVariable = Option("title"), template = Some("h2.node-title"), replaceWith = None)
-  val authorAction = Action(order = 1, actionType = "css-selector", inputVariable = Option("dateauthor"), outputVariable = Option("author"), template = Some("a"), replaceWith = None)
+  val dateAuthorAction = Action(order = 1, actionType = "css-selector", inputVariable = None, outputVariable = Option("dateauthor"), template = Some("div.dateauthor"), replaceWith = None, locale = None, pattern = None, padTime = None)
+  val titleAction = Action(order = 2, actionType = "css-selector", inputVariable = None, outputVariable = Option("title"), template = Some("h2.node-title"), replaceWith = None, locale = None, pattern = None, padTime = None)
+  val authorAction = Action(order = 1, actionType = "css-selector", inputVariable = Option("dateauthor"), outputVariable = Option("author"), template = Some("a"), replaceWith = None, locale = None, pattern = None, padTime = None)
 
 
   "ArticleExtractor" should "succeed on a single split action" in {
@@ -22,15 +22,6 @@ class ArticleExtractorTest extends FlatSpecLike {
     assert(article.author.contains("Maira Sutton"))
     assert(article.title == "Trade Officials Announce Conclusion of TPP—Now the Real Fight Begins")
   }
-
-  it should "find grouping names" in {
-    val names = AE.findGroupingNamesInRegEx("(?<month>\\w+)\\s(?<day>\\d+),\\s(?<year>\\d+)")
-    assert(names.head == "month")
-    assert(names.tail.head == "day")
-    assert(names.last == "year")
-
-  }
-
 
   def getFileAsString(fileName: String): String = {
     val file = io.Source.fromFile(s"./src/test/testware/pages/$fileName")

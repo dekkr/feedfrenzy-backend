@@ -1,7 +1,7 @@
 package nl.dekkr.feedfrenzy.backend
 
+import nl.dekkr.feedfrenzy.backend.extractor.ArticleLinksExtractor
 import nl.dekkr.feedfrenzy.backend.model.Action
-import nl.dekkr.feedfrenzy.backend.util.ArticleLinksExtractor
 import org.scalatest.FlatSpecLike
 
 
@@ -9,9 +9,9 @@ class ArticleLinksExtractorTest extends FlatSpecLike {
 
   val AE = new ArticleLinksExtractor()
 
-  val actionSplit = Action(order = 1, actionType = "split", inputVariable = None, outputVariable = Option("anchor"), template = Some("div.views-field-view-node > span.field-content > a"), replaceWith = None)
+  val actionSplit = Action(order = 1, actionType = "split", inputVariable = None, outputVariable = Option("anchor"), template = Some("div.views-field-view-node > span.field-content > a"), replaceWith = None, locale = None, pattern = None, padTime = None)
 
-  val actionAttribute = Action(order = 2, actionType = "attribute", inputVariable = Option("anchor"), outputVariable = None, template = Some("href"), replaceWith = None)
+  val actionAttribute = Action(order = 2, actionType = "attribute", inputVariable = Option("anchor"), outputVariable = None, template = Some("href"), replaceWith = None, locale = None, pattern = None, padTime = None)
 
 
   "AticleLinksExtractor" should "succeed on a single split action" in {

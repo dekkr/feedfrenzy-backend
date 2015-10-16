@@ -1,4 +1,4 @@
-package nl.dekkr.feedfrenzy.backend.util
+package nl.dekkr.feedfrenzy.backend.extractor
 
 import com.typesafe.scalalogging.Logger
 import nl.dekkr.feedfrenzy.backend.model.{Action, ArticleLinks, RawVariables}

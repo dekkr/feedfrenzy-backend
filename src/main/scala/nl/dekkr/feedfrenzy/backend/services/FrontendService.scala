@@ -14,49 +14,14 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.FlowMaterializer
 import akka.stream.scaladsl.{Flow, Sink, Source}
+import nl.dekkr.feedfrenzy.backend.extractor.{ArticleLinksExtractor, ArticleExtractor}
 import nl.dekkr.feedfrenzy.backend.model._
-import nl.dekkr.feedfrenzy.backend.util.{ArticleExtractor, ArticleLinksExtractor}
-import spray.json._
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter._
+import nl.dekkr.feedfrenzy.backend.util.JsonFormatting
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-trait Protocols extends DefaultJsonProtocol {
-  implicit val action = jsonFormat6(Action.apply)
-  implicit val articleLinksRequest = jsonFormat3(ArticleLinksRequest.apply)
-  implicit val articleRequest = jsonFormat3(ArticleRequest.apply)
-  implicit val articleLinks = jsonFormat1(ArticleLinks.apply)
-  implicit val article = jsonFormat7(Article.apply)
-  implicit val rawVariable = jsonFormat2(RawVariable.apply)
-  implicit val rawVariables = jsonFormat2(RawVariables.apply)
-  implicit val newContent = jsonFormat1(NewContent.apply)
 
-
-  implicit object OffsetDateTimeJsonFormat extends RootJsonFormat[OffsetDateTime] {
-    override def write(obj: OffsetDateTime) = JsString(obj.format(ISO_OFFSET_DATE_TIME))
-    override def read(json: JsValue): OffsetDateTime = json match {
-      case JsString(s) => OffsetDateTime.parse(s)
-      case _ => throw new DeserializationException("Could not parse date/time")
-    }
-  }
-
-  implicit object OptionOffsetDateTimeJsonFormat extends RootJsonFormat[Option[OffsetDateTime]] {
-    override def write(obj: Option[OffsetDateTime]) = obj match {
-      case None => JsNull
-      case Some(dt) =>   JsString(dt.format(ISO_OFFSET_DATE_TIME))
-    }
-    override def read(json: JsValue) : Option[OffsetDateTime] = json match {
-      case JsString(s) =>  Some(OffsetDateTime.parse(s))
-      case _ => throw new DeserializationException("Could not parse date/time")
-    }
-  }
-
-
-
-}
-
-trait FrontendService extends Protocols with Configuration {
+trait FrontendService extends JsonFormatting with Configuration {
   lazy val pageFetcherFlow: Flow[HttpRequest, HttpResponse, Any] =
     Http().outgoingConnection(PAGEFETCHER_INTERFACE, PAGEFETCHER_PORT)
   implicit val system: ActorSystem
