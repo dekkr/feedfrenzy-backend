@@ -1,6 +1,5 @@
-package nl.dekkr.feedfrenzy.backend
+package nl.dekkr.feedfrenzy.backend.extractor
 
-import nl.dekkr.feedfrenzy.backend.extractor.ArticleLinksExtractor
 import nl.dekkr.feedfrenzy.backend.model.Action
 import org.scalatest.FlatSpecLike
 

@@ -1,20 +1,19 @@
 package nl.dekkr.feedfrenzy.backend.extractor.action
 
-import java.text.ParseException
-import java.time.format.{DateTimeFormatter, DateTimeParseException}
+import java.time.format.{DateTimeFormatterBuilder, DateTimeFormatter, DateTimeParseException}
 import java.time.{LocalDate, LocalTime, OffsetDateTime, ZoneOffset}
 import java.util.Locale
 
 import nl.dekkr.feedfrenzy.backend.model.DateParser
 
 
-class ParseDate extends BaseAction {
+class ParseDateAction extends BaseAction {
 
   def execute(vars : VariableMap, a: DateParser): List[String] = {
     val inputVar = getVariable(a.inputVariable, vars)
     try {
       val locale: Locale = new Locale(a.locale)
-      val formatter = DateTimeFormatter.ofPattern(a.pattern).withLocale(locale)
+      val formatter = createFormatter(a.pattern, locale)
       inputVar map { inputVar =>
         try {
           val date = LocalDate.parse(inputVar, formatter)
@@ -30,8 +29,8 @@ class ParseDate extends BaseAction {
           }
           OffsetDateTime.of(date, time, ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         } catch {
-          case e: ParseException =>
-            val response = s"ERROR: Could not parse date string [$inputVar] with format [${a.pattern}] and locale [${a.locale}] - ${e.getMessage}"
+          case e: DateTimeParseException =>
+            val response = s"ERROR: ${e.getMessage} - Format [${a.pattern}], locale [${a.locale}]"
             logger.warn(response)
             response
           case e: NullPointerException =>
@@ -45,5 +44,17 @@ class ParseDate extends BaseAction {
         inputVar
     }
   }
+
+  /** *
+    * Need a case-insensitive parser
+    * @param pattern - Pattern to use for parsing
+    * @param locale - The locale to be used
+    */
+  private def createFormatter(pattern: String, locale: Locale): DateTimeFormatter  =
+    new DateTimeFormatterBuilder()
+      .parseCaseInsensitive()
+      .appendPattern(pattern)
+        .toFormatter
+      .withLocale(locale)
 
 }

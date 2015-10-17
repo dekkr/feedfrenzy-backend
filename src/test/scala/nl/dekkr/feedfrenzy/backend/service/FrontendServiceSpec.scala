@@ -1,4 +1,5 @@
-package nl.dekkr.feedfrenzy.backend
+package nl.dekkr.feedfrenzy.backend.service
+
 import org.specs2.mutable.Specification
 
 

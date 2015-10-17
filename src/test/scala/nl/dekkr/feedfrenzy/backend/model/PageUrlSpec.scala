@@ -1,11 +1,10 @@
-package nl.dekkr.feedfrenzy.backend
+package nl.dekkr.feedfrenzy.backend.model
 
-import nl.dekkr.feedfrenzy.backend.model.PageUrl
 import org.specs2.mutable.Specification
 
-class ModelSpec extends Specification {
+class PageUrlSpec extends Specification {
 
-  "Model" should {
+  "PageUrl" should {
 
     "fail on a empty url " in {
       PageUrl(url = "") must throwAn[Exception]

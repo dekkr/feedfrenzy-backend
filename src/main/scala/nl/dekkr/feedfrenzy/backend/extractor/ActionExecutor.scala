@@ -43,7 +43,7 @@ trait ActionExecutor extends ValMap {
 
       case a: Regex => new RegexAction().execute(vars, a)
 
-      case a: DateParser => new ParseDate().execute(vars, a)
+      case a: DateParser => new ParseDateAction().execute(vars, a)
 
       case a: Split => new SplitAction().execute(vars, a)
 
