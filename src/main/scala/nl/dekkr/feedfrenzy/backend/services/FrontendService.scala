@@ -6,17 +6,17 @@ import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.client.RequestBuilding
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.FlowMaterializer
+import akka.stream.Materializer
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import nl.dekkr.feedfrenzy.backend.extractor.{ArticleLinksExtractor, ArticleExtractor}
 import nl.dekkr.feedfrenzy.backend.model._
 import nl.dekkr.feedfrenzy.backend.util.JsonFormatting
+
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -25,7 +25,7 @@ trait FrontendService extends JsonFormatting with Configuration {
   lazy val pageFetcherFlow: Flow[HttpRequest, HttpResponse, Any] =
     Http().outgoingConnection(PAGEFETCHER_INTERFACE, PAGEFETCHER_PORT)
   implicit val system: ActorSystem
-  implicit val materializer: FlowMaterializer
+  implicit val materializer: Materializer
 
   val logger: LoggingAdapter
   val routes = {

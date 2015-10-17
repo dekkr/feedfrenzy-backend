@@ -57,3 +57,26 @@ Result
   "uid": "https://www.eff.org/deeplinks/2015/10/trade-officials-announce-conclusion-tpp-now-real-fight-begins" 
 }
 ```
+
+
+##Docker images
+
+Create the image (optional)
+
+```bash
+sbt docker:publishLocal
+```
+
+Start the backend
+
+```bash
+ docker run -p 8029:8029 --link pagefetch-postgres:postgres -d dekkr/feedfrenzy-backend:latest
+ ```
+ 
+ To start the whole stack so far:
+
+ ```bash
+docker run --name pagefetch-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=pagefetcher -d postgres:latest
+docker run -p 8080:8080 --name pagefetcher --link pagefetch-postgres:postgres -d dekkr/pagefetcher:latest
+docker run -p 8029:8029 --link pagefetcher:pagefetcher -d dekkr/feedfrenzy-backend:latest
+ ```

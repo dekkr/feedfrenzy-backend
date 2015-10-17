@@ -4,9 +4,10 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter._
 
 import nl.dekkr.feedfrenzy.backend.model._
-import spray.json.{DefaultJsonProtocol, _}
+import spray.json._
+import spray.json.DefaultJsonProtocol._
 
-trait JsonFormatting extends DefaultJsonProtocol {
+trait JsonFormatting extends akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport {
   implicit val action = jsonFormat9(Action.apply)
   implicit val articleLinksRequest = jsonFormat3(ArticleLinksRequest.apply)
   implicit val articleRequest = jsonFormat3(ArticleRequest.apply)
@@ -25,18 +26,5 @@ trait JsonFormatting extends DefaultJsonProtocol {
       case _ => throw new DeserializationException("Could not parse date/time")
     }
   }
-
-  implicit object OptionOffsetDateTimeJsonFormat extends RootJsonFormat[Option[OffsetDateTime]] {
-    override def write(obj: Option[OffsetDateTime]) = obj match {
-      case None => JsNull
-      case Some(dt) => JsString(dt.format(ISO_OFFSET_DATE_TIME))
-    }
-
-    override def read(json: JsValue): Option[OffsetDateTime] = json match {
-      case JsString(s) => Some(OffsetDateTime.parse(s))
-      case _ => throw new DeserializationException("Could not parse date/time")
-    }
-  }
-
 
 }

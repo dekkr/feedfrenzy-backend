@@ -1,7 +1,8 @@
+
 lazy val commonSettings = Seq(
   organization := "dekkR projects",
-  version := "0.0.1",
-  scalaVersion := "2.11.6"
+  version := "0.1.0",
+  scalaVersion := "2.11.7"
 )
 
 lazy val root = (project in file(".")).
@@ -11,19 +12,17 @@ lazy val root = (project in file(".")).
   )
 
 libraryDependencies ++= {
-  val akkaV       = "2.3.12"
-  val akkaStreamV = "1.0-RC2"
+  val akkaV       = "2.4.0"
+  val akkaStreamV = "1.0"
   val scalaTestV  = "2.2.4"
   val scalaLoggingVersion = "3.1.0"
-  val slf4jVersion = "1.7.10"
   val logbackVersion = "1.1.3"
   Seq(
     "com.typesafe.akka" %% "akka-actor"                           % akkaV,
-    "com.typesafe.akka" %% "akka-stream-experimental"             % akkaStreamV,
-    "com.typesafe.akka" %% "akka-http-core-experimental"          % akkaStreamV,
-    "com.typesafe.akka" %% "akka-http-scala-experimental"         % akkaStreamV,
     "com.typesafe.akka" %% "akka-http-spray-json-experimental"    % akkaStreamV,
-    "com.typesafe.akka" %% "akka-http-testkit-scala-experimental" % akkaStreamV,
+    "com.typesafe.akka" % "akka-stream-experimental_2.11"         % akkaStreamV,
+    "com.typesafe.akka" % "akka-http-core-experimental_2.11"      % akkaStreamV,
+    "com.typesafe.akka" % "akka-http-experimental_2.11"           % akkaStreamV,
     "org.scalatest"     %% "scalatest"                            % scalaTestV % "test",
     "commons-validator" % "commons-validator"                     % "1.4.1",
     "org.jsoup"         % "jsoup"                                 % "1.8.2",
@@ -59,7 +58,7 @@ bintraySettings
 
 bintray.Keys.bintrayOrganization in bintray.Keys.bintray := Some("dekkr")
 
-bintray.Keys.repository in bintray.Keys.bintray := "feedr"
+bintray.Keys.repository in bintray.Keys.bintray := "feedfrenzy-backend"
 
 bintray.Keys.packageLabels in bintray.Keys.bintray := Seq("microservice", "syndication")
 
@@ -73,8 +72,7 @@ assemblyJarName in assembly := s"${name.value}-assembly-${version.value}.jar"
 
 //assemblyMergeStrategy in assembly := {
 //  case x if x.contains("org/apache/commons/collections") => MergeStrategy.first
-//  case x if x.contains("com/esotericsoftware/minlog/") => MergeStrategy.first
-//  case x if x.contains("org/xmlpull/v1/XmlPullParser") => MergeStrategy.first
+//  case x if x.contains("com/typesafe/scalalogging/Logger") => MergeStrategy.first
 //  case x =>
 //    val oldStrategy = (assemblyMergeStrategy in assembly).value
 //    oldStrategy(x)
@@ -102,3 +100,44 @@ pomExtra :=
       <developerConnection>scm:git:git@github.com:dekkr/{name.value}.git</developerConnection>
       <url>git@github.com:dekkr/{name.value}.git</url>
     </scm>
+
+//
+
+enablePlugins(JavaServerAppPackaging)
+//enablePlugins(AshScriptPlugin)
+
+packageSummary in Docker := "feedfrenzy-backend"
+dockerExposedPorts in Docker := Seq(8029) // Ports to expose from container for Docker container linking
+dockerRepository := Some("dekkr") // Repository used when publishing Docker image
+dockerUpdateLatest := true
+
+mappings in Docker <+= (packageBin in Compile, sourceDirectory) map { (_, src) =>
+  val conf = src / "main" / "resources" / "docker-reference.conf"
+  conf -> "/opt/docker/conf/application.conf"
+}
+
+mappings in Docker <+= (packageBin in Compile, sourceDirectory) map { (_, src) =>
+  val conf = src / "main" / "resources" / "logback.xml"
+  conf -> "/opt/docker/conf/logback.xml"
+}
+
+bashScriptExtraDefines += """addJava "-Dlogback.configurationFile=${app_home}/../conf/logback.xml""""
+bashScriptExtraDefines += """addJava "-Dconfig.file=${app_home}/../conf/application.conf""""
+bashScriptExtraDefines += """cd ${app_home}/../"""
+
+
+//// removes all jar mappings in universal and appends the fat jar
+//mappings in Universal := {
+//  // universalMappings: Seq[(File,String)]
+//  val universalMappings = (mappings in Universal).value
+//  val fatJar = (assembly in Compile).value
+//  // removing means filtering
+//  val filtered = universalMappings filter {
+//    case (file, fileName) => !fileName.endsWith(".jar")
+//  }
+//  // add the fat jar
+//  filtered :+ (fatJar -> ("lib/" + fatJar.getName))
+//}
+//
+//// the bash scripts classpath only needs the fat jar
+//scriptClasspath := Seq((assemblyJarName in assembly).value)

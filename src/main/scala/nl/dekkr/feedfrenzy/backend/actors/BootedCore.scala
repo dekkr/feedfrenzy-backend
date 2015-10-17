@@ -16,6 +16,6 @@ trait BootedCore extends Core {
   /**
    * Ensure that the constructed ActorSystem is shut down when the JVM shuts down
    */
-  sys.addShutdownHook(system.shutdown())
+  sys.addShutdownHook(system.terminate())
 
 }
