@@ -37,6 +37,19 @@ class ArticleLinksExtractorTest extends FlatSpecLike {
   }
 
 
+
+  it should "return the raw results" in {
+    val content = getFileAsString("eff-deeplinks-blog.html")
+
+    val attributed = AE.getRaw(content, List(actionSplit, actionAttribute))
+    assert(attributed.variables.length == 1)
+
+    val urls = attributed .variables.find(v => v.name == "anchor").map(_.values).get
+    assert(urls.length == 8)
+    urls.foreach(a => a.startsWith("<a href=\"https://"))
+  }
+
+
   def getFileAsString(fileName: String): String = {
     val file = io.Source.fromFile(s"./src/test/testware/pages/$fileName")
     try file.mkString finally file.close()
