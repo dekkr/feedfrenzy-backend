@@ -24,4 +24,18 @@ class AttributeActionTest extends FlatSpecLike {
     val actionAttributeNoMatch = new Attribute(inputVariable = Some("input"), outputVariable = Some("split"), attribute = "src")
     assert(AA.execute(vars, actionAttributeNoMatch) == List(""))
   }
+
+  it should "not fail on empty input" in {
+    val vars = Map("input" -> List(""))
+    val actionAttributeNoMatch = new Attribute(inputVariable = Some("input"), outputVariable = Some("split"), attribute = "href")
+    assert(AA.execute(vars, actionAttributeNoMatch) == List(""))
+  }
+
+  it should "not fail on empty attribute" in {
+    val vars = Map("input" -> List(testHtml))
+    val actionAttributeNoMatch = new Attribute(inputVariable = Some("input"), outputVariable = Some("split"), attribute = "")
+    assert(AA.execute(vars, actionAttributeNoMatch) == List(""))
+  }
+
+
 }
