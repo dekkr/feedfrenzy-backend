@@ -31,7 +31,7 @@ class ArticleExtractor extends ActionExecutor {
         Some(OffsetDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME))
       } catch {
         case e: DateTimeParseException =>
-          Some(OffsetDateTime.now())
+          None
       }
     case None => None
   }
