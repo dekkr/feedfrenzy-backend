@@ -69,6 +69,36 @@ class ParseDateActionTest extends FlatSpecLike {
     assert(resultTime.startsWith(time))
   }
 
+  it should "return a empty list if the input is an empty list" in {
+    val pattern = "dd MMM yyyy"
+    val locale = "nl"
+
+    val actionLongFormat = new DateParser(inputVariable = Some("d"), outputVariable = Some("r1"), pattern = pattern, locale = locale, padTime = true)
+    val result = PDA.execute(Map("d" -> List.empty), actionLongFormat)
+    assert(result.isEmpty)
+  }
+
+  it should "return a an error message in the result if the input is a list with a empty string" in {
+    val pattern = "dd MMM yyyy"
+    val locale = "nl"
+
+    val actionLongFormat = new DateParser(inputVariable = Some("d"), outputVariable = Some("r1"), pattern = pattern, locale = locale, padTime = true)
+    val result = PDA.execute(Map("d" -> List("")), actionLongFormat)
+    assert(result == List(s"ERROR: Text '' could not be parsed at index 0 - Format [$pattern], locale [$locale]"))
+  }
+
+
+  it should "return the input if the pattern is invalid" in {
+    val date = "12 okt 2015"
+    val pattern = "invalid-pattern"
+    val locale = "nl"
+
+    val actionLongFormat = new DateParser(inputVariable = Some("d"), outputVariable = Some("r1"), pattern = pattern, locale = locale, padTime = true)
+    val result = PDA.execute(Map("d" -> List(date)), actionLongFormat)
+    assert(result == List(date))
+  }
+
+
 
   def testPattern(locale: String, expectedResult: String, date: String, pattern: String): Unit = {
     val actionLongFormat = new DateParser(inputVariable = Some("d"), outputVariable = Some("r1"), pattern = pattern, locale = locale, padTime = false)
