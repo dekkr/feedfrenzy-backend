@@ -19,7 +19,7 @@ class AttributeActionTest extends FlatSpecLike {
     assert(AA.execute(vars, actionAttribute) == List("https://www.eff.org/about/staff/maira-sutton"))
   }
 
-  it should "find handle a non-exisiting attribute" in {
+  it should "handle a non-exisiting attribute" in {
     val vars = Map("input" -> List(testHtml))
     val actionAttributeNoMatch = new Attribute(inputVariable = Some("input"), outputVariable = Some("split"), attribute = "src")
     assert(AA.execute(vars, actionAttributeNoMatch) == List(""))

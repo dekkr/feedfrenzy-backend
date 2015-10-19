@@ -33,10 +33,6 @@ class ParseDateAction extends BaseAction {
             val response = s"ERROR: ${e.getMessage} - Format [${a.pattern}], locale [${a.locale}]"
             logger.warn(response)
             response
-          case e: NullPointerException =>
-            val response = s"ERROR: Empty input date - ${e.getMessage}"
-            logger.warn(response)
-            response
         }
       }
     } catch {
