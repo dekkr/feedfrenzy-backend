@@ -26,14 +26,14 @@ class ArticleExtractor extends ActionExecutor {
   }
 
   private def convertToDate(dateStr: Option[String]) = dateStr match {
-    case Some(date) =>
+    case Some(date) if date.length > 10 =>
       try {
         Some(OffsetDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME))
       } catch {
         case e: DateTimeParseException =>
           None
       }
-    case None => None
+    case _ => None // Date empty or to short to be valid
   }
 
   private def getVars(url: String, input: String, actions: List[Action]) =
