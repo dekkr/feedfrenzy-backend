@@ -5,10 +5,6 @@ sealed trait ActionType {}
 
 case class CssSelector(inputVariable: Option[String], outputVariable: Option[String], selectorPattern: String) extends ActionType
 
-case class CssSelectorRemove(inputVariable: Option[String], outputVariable: Option[String], selectorPattern: String) extends ActionType
-
-case class CssSelectorParent(inputVariable: Option[String], outputVariable: Option[String], selectorPattern: String) extends ActionType
-
 case class Attribute(inputVariable: Option[String], outputVariable: Option[String], attribute: String) extends ActionType
 
 case class Regex(inputVariable: Option[String], outputVariable: Option[String], regex: String) extends ActionType

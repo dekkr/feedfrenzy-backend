@@ -1,12 +1,12 @@
 package nl.dekkr.feedfrenzy.backend.extractor.action
 
-import nl.dekkr.feedfrenzy.backend.model.CssSelectorRemove
+import nl.dekkr.feedfrenzy.backend.model.CssSelector
 import org.scalatest.FlatSpecLike
 
 
-class RemoveWithCssSelectorActionTest extends FlatSpecLike {
+class CssRemoveActionTest extends FlatSpecLike {
 
-  val RWCS = new RemoveWithCssSelectorAction()
+  val RWCS = new CssRemoveAction()
 
   val testHtml =
     """
@@ -15,7 +15,7 @@ class RemoveWithCssSelectorActionTest extends FlatSpecLike {
 
   val vars = Map("input" -> List(testHtml))
 
-  val actionRemove = new CssSelectorRemove(inputVariable = Some("input"), outputVariable = Some("split"),selectorPattern = "a")
+  val actionRemove = new CssSelector(inputVariable = Some("input"), outputVariable = Some("split"), selectorPattern = "a")
   "RemoveWithCssSelectorAction" should "remove the achor tag" in {
     assert(RWCS.execute(vars, actionRemove) == List("October 5, 2015 | By \n"))
   }

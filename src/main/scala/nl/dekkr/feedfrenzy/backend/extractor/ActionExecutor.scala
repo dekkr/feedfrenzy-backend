@@ -22,50 +22,60 @@ trait ActionExecutor extends ValMap {
     RawVariables(vars.filter(_._1 != inputVar).map(v => RawVariable(v._1, v._2)).toList, input)
 
 
-  private def action2ActionType(action: Action): ActionType = {
-    action.actionType.toLowerCase match {
-      case "css-selector" => CssSelector(action.inputVariable, action.outputVariable, selectorPattern = action.template.get)
-      case "css-remove" => CssSelectorRemove(action.inputVariable, action.outputVariable, selectorPattern = action.template.get)
-      case "css-parent" => CssSelectorParent(action.inputVariable, action.outputVariable, selectorPattern = action.template.get)
-      case "attribute" => Attribute(action.inputVariable, action.outputVariable, attribute = action.template.get)
-      case "template" => Template(action.outputVariable, template = action.template.get)
-      case "regex" => Regex(action.inputVariable, action.outputVariable, regex = action.template.get)
-      case "date-parser" => DateParser(action.inputVariable, action.outputVariable, pattern = action.pattern.get, locale = action.locale.get, padTime = action.padTime.getOrElse(false))
-      case "replace" => Replace(action.inputVariable, action.outputVariable, find = action.template.get, replaceWith = action.replaceWith.get)
-      case "split" => Split(action.inputVariable, action.outputVariable, selectorPattern = action.template.get)
-      case _ => throw new NoSuchMethodException
-    }
-  }
-
   private def performSingleAction(action: Action, vars: VariableMap): VariableMap = {
 
-    val output: List[String] = action2ActionType(action) match {
+    val output: List[String] = action.actionType match {
 
-      case a: Regex => new RegexAction().execute(vars, a)
+      case TypeOfAction.CssSelector =>
+        new CssSelectorAction().execute(vars,
+          CssSelector(action.inputVariable, action.outputVariable, selectorPattern = action.template.get)
+        )
 
-      case a: DateParser => new ParseDateAction().execute(vars, a)
+      case TypeOfAction.CssSelectorRemove =>
+        new CssRemoveAction().execute(vars,
+          CssSelector(action.inputVariable, action.outputVariable, selectorPattern = action.template.get)
+        )
 
-      case a: Split => new SplitAction().execute(vars, a)
+      case TypeOfAction.CssSelectorParent =>
+        new CssParentSelectorAction().execute(vars,
+          CssSelector(action.inputVariable, action.outputVariable, selectorPattern = action.template.get)
+        )
 
-      case a: CssSelector => new CssSelectorAction().execute(vars, a)
+      case TypeOfAction.Attribute =>
+        new AttributeAction().execute(vars,
+          Attribute(action.inputVariable, action.outputVariable, attribute = action.template.get)
+        )
 
-      case a: CssSelectorParent => new CssParentSelectorAction().execute(vars, CssSelector(inputVariable = a.inputVariable,outputVariable = a.outputVariable,selectorPattern = a.selectorPattern))
+      case TypeOfAction.Template =>
+        new TemplateAction().execute(vars,
+          Template(action.outputVariable, template = action.template.get)
+        )
 
-      case a: CssSelectorRemove => new RemoveWithCssSelectorAction().execute(vars, a)
+      case TypeOfAction.Regex =>
+        new RegexAction().execute(vars,
+          Regex(action.inputVariable, action.outputVariable, regex = action.template.get)
+        )
 
-      case a: Attribute => new AttributeAction().execute(vars, a)
+      case TypeOfAction.DateParser =>
+        new ParseDateAction().execute(vars,
+          DateParser(action.inputVariable, action.outputVariable, pattern = action.pattern.get, locale = action.locale.get, padTime = action.padTime.getOrElse(false))
+        )
 
-      case a: Template => new TemplateAction().execute(vars,a)
+      case TypeOfAction.Replace =>
+        new ReplaceAction().execute(vars,
+          Replace(action.inputVariable, action.outputVariable, find = action.template.get, replaceWith = action.replaceWith.get)
+        )
 
-      case a: Replace => new ReplaceAction().execute(vars,a)
+      case TypeOfAction.Split =>
+        new SplitAction().execute(vars,
+          Split(action.inputVariable, action.outputVariable, selectorPattern = action.template.get)
+        )
 
       case _ =>
-        // TODO log error
-        List("-- actionType not implemented --")
+        throw new NoSuchMethodException
     }
     vars.filter(v => v._1.ne(action.outputVariable.getOrElse(inputVar))) + (action.outputVariable.getOrElse(inputVar) -> output)
   }
-
 
 
 }
