@@ -3,10 +3,11 @@ package nl.dekkr.feedfrenzy.backend.extractor
 import java.time.format.DateTimeFormatter
 
 import nl.dekkr.feedfrenzy.backend.model.Action
+import nl.dekkr.feedfrenzy.backend.test.TestHelper
 import org.scalatest.FlatSpecLike
 
 
-class ArticleExtractorTest extends FlatSpecLike {
+class ArticleExtractorTest extends FlatSpecLike with TestHelper {
 
   val AE = new ArticleExtractor()
 
@@ -75,10 +76,19 @@ class ArticleExtractorTest extends FlatSpecLike {
     assert(rawList.variables.find(v => v.name == "template").map(_.values).contains(List("<span><a href=\"dummy.html\">Dummy</a></span>")))
   }
 
+  it should "throw an exception when a unknown action is found" in {
+    val startHtml = "<div><a href=\"dummy.html\">Dummy</a></div>"
+    val cssParentSelectionAction = Action(order = 1, actionType = "css-parent", inputVariable = None, outputVariable = Option("parent"), template = Some("a"), replaceWith = None, locale = None, pattern = None, padTime = None)
+    val replaceAction = Action(order = 2, actionType = "replace", inputVariable = Option("parent"), outputVariable = Option("replace"), template = Some("dummy.html"), replaceWith = Some("empty.html"), locale = None, pattern = None, padTime = None)
+    val cssRemoveAction = Action(order = 3, actionType = "css-remove", inputVariable = None, outputVariable = Option("remove"), template = Some("a"), replaceWith = None, locale = None, pattern = None, padTime = None)
+    val templateAction = Action(order = 4, actionType = "does-not-exist", inputVariable = None, outputVariable = Option("template"), template = Some("<span>{parent}</span>"), replaceWith = None, locale = None, pattern = None, padTime = None)
 
-  def getFileAsString(fileName: String): String = {
-    val file = io.Source.fromFile(s"./src/test/testware/pages/$fileName")
-    try file.mkString finally file.close()
+    val otherActions = List(cssParentSelectionAction, replaceAction, cssRemoveAction, templateAction)
+
+    intercept[NoSuchMethodException](AE.getRaw(dummyUrl, startHtml, otherActions))
   }
+
+
+
 
 }
