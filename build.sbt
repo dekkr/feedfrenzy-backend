@@ -126,7 +126,7 @@ mappings in Docker <+= (packageBin in Compile, sourceDirectory) map { (_, src) =
 }
 
 mappings in Docker <+= (packageBin in Compile, sourceDirectory) map { (_, src) =>
-  val conf = src / "main" / "resources" / "logback.xml"
+  val conf = src / "main" / "resources" / "logback-reference.xml"
   conf -> "/opt/docker/conf/logback.xml"
 }
 

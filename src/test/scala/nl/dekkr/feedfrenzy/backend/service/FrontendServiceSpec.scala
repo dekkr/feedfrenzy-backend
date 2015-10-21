@@ -8,12 +8,10 @@ import nl.dekkr.feedfrenzy.backend.model._
 import nl.dekkr.feedfrenzy.backend.services.FrontendService
 import nl.dekkr.feedfrenzy.backend.test.TestHelper
 import org.scalatest.{Matchers, WordSpec}
-import spray.json.JsString
 
 class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest with FrontendService with TestHelper {
 
   override val logger = Logging(system, getClass)
-
 
   val contentTypeHeader = RawHeader("Content-type", "application/json")
 
