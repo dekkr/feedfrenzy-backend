@@ -23,6 +23,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" % "akka-stream-experimental_2.11" % akkaStreamV,
     "com.typesafe.akka" % "akka-http-core-experimental_2.11" % akkaStreamV,
     "com.typesafe.akka" % "akka-http-experimental_2.11" % akkaStreamV,
+    "com.typesafe.akka" % "akka-http-testkit-experimental_2.11" % akkaStreamV % "test",
     "org.scalatest" %% "scalatest" % scalaTestV % "test",
     "commons-validator" % "commons-validator" % "1.4.1",
     "org.jsoup" % "jsoup" % "1.8.2",
