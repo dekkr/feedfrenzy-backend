@@ -12,7 +12,7 @@ lazy val root = (project in file(".")).
   )
 
 libraryDependencies ++= {
-  val akkaV = "2.4.0"
+  val akkaV = "2.3.12"
   val akkaStreamV = "1.0"
   val scalaTestV = "2.2.4"
   val scalaLoggingVersion = "3.1.0"
@@ -20,8 +20,6 @@ libraryDependencies ++= {
   Seq(
     "com.typesafe.akka" %% "akka-actor" % akkaV,
     "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaStreamV,
-    "com.typesafe.akka" % "akka-stream-experimental_2.11" % akkaStreamV,
-    "com.typesafe.akka" % "akka-http-core-experimental_2.11" % akkaStreamV,
     "com.typesafe.akka" % "akka-http-experimental_2.11" % akkaStreamV,
     "com.typesafe.akka" % "akka-http-testkit-experimental_2.11" % akkaStreamV % "test",
     "org.scalatest" %% "scalatest" % scalaTestV % "test",
