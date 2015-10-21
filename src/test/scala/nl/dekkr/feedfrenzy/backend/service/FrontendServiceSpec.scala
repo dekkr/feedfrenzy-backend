@@ -36,6 +36,7 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
         status shouldEqual OK
         responseAs[ArticleLinks].urls.length should be > 0
       }
+      pending
     }
 
     "return a list of raw variable" in {
@@ -44,6 +45,7 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
         status shouldEqual OK
         responseAs[RawVariables].variables.length shouldBe  0
       }
+      pending
     }
 
     "return a bad request on a empty / incorrect request" in {
@@ -51,6 +53,7 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
       Post("/v1/createArticleLinks", emptyUrlRequest) ~> routes ~> check {
         status shouldEqual BadRequest
       }
+      pending
     }
 
     "return an article" in {
@@ -59,6 +62,7 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
         status shouldEqual OK
         responseAs[Article] shouldEqual Article("http://google.com","",None,"",None,None,List())
       }
+      pending
     }
 
     "return the raw article variables" in {
@@ -67,6 +71,7 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
         status shouldEqual OK
         responseAs[RawVariables].variables.length shouldBe 1
       }
+      pending
     }
 
     "leave GET requests to other paths unhandled" in {
