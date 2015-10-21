@@ -23,10 +23,6 @@ object TypeOfAction extends Enumeration {
     }
   }
 
-  implicit def typeOfAction2String(toa: TypeOfAction): String = {
-    TypeOfAction.toString()
-
-  }
-
+  implicit def typeOfAction2String(toa: TypeOfAction): String = toa.toString
 
 }
