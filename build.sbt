@@ -37,35 +37,38 @@ libraryDependencies ++= {
 
 Revolver.settings
 
+scalacOptions += "-target:jvm-1.8"
+
+javacOptions ++= Seq("-encoding", "UTF-8")
+
 scalacOptions in ThisBuild ++= Seq(Opts.compile.deprecation, Opts.compile.unchecked) ++
   Seq("-Ywarn-unused-import", "-Ywarn-unused", "-Xlint", "-feature")
 
-Seq(buildInfoSettings: _*)
 
-sourceGenerators in Compile <+= buildInfo
+// sourceGenerators in Compile <+= buildInfo
 
-buildInfoKeys := Seq[BuildInfoKey](version)
+// buildInfoKeys := Seq[BuildInfoKey](version)
 
-buildInfoPackage := "feedfrenzy_backend"
+// buildInfoPackage := "feedfrenzy_backend"
 
 publishMavenStyle := true
 
 licenses := Seq(
   ("MIT", url(s"https://github.com/dekkr/${name.value}/blob/${version.value}/LICENSE")))
 
-bintraySettings
 
-bintray.Keys.bintrayOrganization in bintray.Keys.bintray := Some("dekkr")
 
-bintray.Keys.repository in bintray.Keys.bintray := "feedfrenzy-backend"
+bintrayOrganization := Some("dekkr")
 
-bintray.Keys.packageLabels in bintray.Keys.bintray := Seq("microservice", "scraping")
+bintrayRepository  := "feedfrenzy-backend"
+
+bintrayPackageLabels := Seq("microservice", "scraping")
 
 lsSettings
 
-LsKeys.tags in LsKeys.lsync := (bintray.Keys.packageLabels in bintray.Keys.bintray).value
+LsKeys.tags in LsKeys.lsync := bintrayPackageLabels.value
 
-externalResolvers in LsKeys.lsync := (resolvers in bintray.Keys.bintray).value
+//externalResolvers in LsKeys.lsync := bintrayResolvers.value
 
 assemblyJarName in assembly := s"${name.value}-assembly-${version.value}.jar"
 
