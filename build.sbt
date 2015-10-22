@@ -6,10 +6,14 @@ lazy val commonSettings = Seq(
 )
 
 lazy val root = (project in file(".")).
-  settings(commonSettings: _*).
-  settings(
+  settings(commonSettings: _*).settings(
     name := "feedfrenzy-backend"
+    )
+  .enablePlugins(BuildInfoPlugin).settings(
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoPackage := "hello"
   )
+
 
 libraryDependencies ++= {
   val akkaV = "2.3.12"
@@ -45,18 +49,11 @@ scalacOptions in ThisBuild ++= Seq(Opts.compile.deprecation, Opts.compile.unchec
   Seq("-Ywarn-unused-import", "-Ywarn-unused", "-Xlint", "-feature")
 
 
-// sourceGenerators in Compile <+= buildInfo
-
-// buildInfoKeys := Seq[BuildInfoKey](version)
-
-// buildInfoPackage := "feedfrenzy_backend"
 
 publishMavenStyle := true
 
 licenses := Seq(
   ("MIT", url(s"https://github.com/dekkr/${name.value}/blob/${version.value}/LICENSE")))
-
-
 
 bintrayOrganization := Some("dekkr")
 
@@ -64,11 +61,11 @@ bintrayRepository  := "feedfrenzy-backend"
 
 bintrayPackageLabels := Seq("microservice", "scraping")
 
+
+
 lsSettings
 
 LsKeys.tags in LsKeys.lsync := bintrayPackageLabels.value
-
-//externalResolvers in LsKeys.lsync := bintrayResolvers.value
 
 assemblyJarName in assembly := s"${name.value}-assembly-${version.value}.jar"
 
