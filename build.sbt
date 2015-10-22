@@ -153,3 +153,7 @@ mappings in Universal := {
 
 // the bash scripts classpath only needs the fat jar
 scriptClasspath := Seq((assemblyJarName in assembly).value)
+
+
+// Trying to get http route test from failing on Travis-CI
+fork in Test := false

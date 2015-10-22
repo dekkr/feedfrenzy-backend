@@ -30,44 +30,44 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
 
   "FrontendService" should {
 
-//    "return a list of article links" in {
-//      val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(false))
-//      Post("/v1/createArticleLinks", requestBody) ~> routes ~> check {
-//        status shouldEqual OK
-//        responseAs[ArticleLinks].urls.length should be > 0
-//      }
-//    }
-//
-//    "return a list of raw variable" in {
-//      val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(true))
-//      Post("/v1/createArticleLinks", requestBody) ~> routes ~> check {
-//        status shouldEqual OK
-//        responseAs[RawVariables].variables.length shouldBe  0
-//      }
-//    }
-//
-//    "return a bad request on a empty / incorrect request" in {
-//      val emptyUrlRequest = ArticleLinksRequest(url = "none", actions = List.empty[Action], raw = Some(false))
-//      Post("/v1/createArticleLinks", emptyUrlRequest) ~> routes ~> check {
-//        status shouldEqual BadRequest
-//      }
-//    }
-//
-//    "return an article" in {
-//      val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(false))
-//      Post("/v1/createArticle", requestBody) ~> addHeader(contentTypeHeader) ~> routes ~> check {
-//        status shouldEqual OK
-//        responseAs[Article] shouldEqual Article("http://google.com","",None,"",None,None,List())
-//      }
-//    }
-//
-//    "return the raw article variables" in {
-//      val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(true))
-//      Post("/v1/createArticle", requestBody) ~> addHeader(contentTypeHeader) ~> routes ~> check {
-//        status shouldEqual OK
-//        responseAs[RawVariables].variables.length shouldBe 1
-//      }
-//    }
+    "return a list of article links" in {
+      val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(false))
+      Post("/v1/createArticleLinks", requestBody) ~> routes ~> check {
+        status shouldEqual OK
+        responseAs[ArticleLinks].urls.length should be > 0
+      }
+    }
+
+    "return a list of raw variable" in {
+      val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(true))
+      Post("/v1/createArticleLinks", requestBody) ~> routes ~> check {
+        status shouldEqual OK
+        responseAs[RawVariables].variables.length shouldBe  0
+      }
+    }
+
+    "return a bad request on a empty / incorrect request" in {
+      val emptyUrlRequest = ArticleLinksRequest(url = "none", actions = List.empty[Action], raw = Some(false))
+      Post("/v1/createArticleLinks", emptyUrlRequest) ~> routes ~> check {
+        status shouldEqual BadRequest
+      }
+    }
+
+    "return an article" in {
+      val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(false))
+      Post("/v1/createArticle", requestBody) ~> addHeader(contentTypeHeader) ~> routes ~> check {
+        status shouldEqual OK
+        responseAs[Article] shouldEqual Article("http://google.com","",None,"",None,None,List())
+      }
+    }
+
+    "return the raw article variables" in {
+      val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(true))
+      Post("/v1/createArticle", requestBody) ~> addHeader(contentTypeHeader) ~> routes ~> check {
+        status shouldEqual OK
+        responseAs[RawVariables].variables.length shouldBe 1
+      }
+    }
 
     "leave GET requests to other paths unhandled" in {
       Get("/v1/nothing") ~> routes ~> check {
