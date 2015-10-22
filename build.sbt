@@ -155,5 +155,3 @@ mappings in Universal := {
 scriptClasspath := Seq((assemblyJarName in assembly).value)
 
 
-// Trying to get http route test from failing on Travis-CI
-javaOptions += "-Xmx1G"
