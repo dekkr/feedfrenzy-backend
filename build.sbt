@@ -156,4 +156,4 @@ scriptClasspath := Seq((assemblyJarName in assembly).value)
 
 
 // Trying to get http route test from failing on Travis-CI
-fork in Test := false
+javaOptions += "-Xmx1G"
