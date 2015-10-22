@@ -60,14 +60,14 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
 //        responseAs[Article] shouldEqual Article("http://google.com","",None,"",None,None,List())
 //      }
 //    }
-
-    "return the raw article variables" in {
-      val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(true))
-      Post("/v1/createArticle", requestBody) ~> addHeader(contentTypeHeader) ~> routes ~> check {
-        status shouldEqual OK
-        responseAs[RawVariables].variables.length shouldBe 1
-      }
-    }
+//
+//    "return the raw article variables" in {
+//      val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(true))
+//      Post("/v1/createArticle", requestBody) ~> addHeader(contentTypeHeader) ~> routes ~> check {
+//        status shouldEqual OK
+//        responseAs[RawVariables].variables.length shouldBe 1
+//      }
+//    }
 
     "leave GET requests to other paths unhandled" in {
       Get("/v1/nothing") ~> routes ~> check {
