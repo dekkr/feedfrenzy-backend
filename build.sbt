@@ -155,3 +155,4 @@ mappings in Universal := {
 scriptClasspath := Seq((assemblyJarName in assembly).value)
 
 
+parallelExecution in Test := false
