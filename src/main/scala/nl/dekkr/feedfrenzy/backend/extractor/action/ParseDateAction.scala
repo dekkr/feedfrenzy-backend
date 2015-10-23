@@ -1,6 +1,6 @@
 package nl.dekkr.feedfrenzy.backend.extractor.action
 
-import java.time.format.{DateTimeFormatterBuilder, DateTimeFormatter, DateTimeParseException}
+import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder, DateTimeParseException}
 import java.time.{LocalDate, LocalTime, OffsetDateTime, ZoneOffset}
 import java.util.Locale
 
@@ -31,12 +31,12 @@ class ParseDateAction extends BaseAction {
         } catch {
           case e: DateTimeParseException =>
             val response = s"ERROR: ${e.getMessage} - Format [${a.pattern}], locale [${a.locale}]"
-            logger.warn(response)
+            logger.debug(response)
             response
         }
       }
     } catch {
-      case e: IllegalArgumentException => logger.warn(s"Could not create date format from format [${a.pattern}] and locale [${a.locale}] - ${e.getMessage}")
+      case e: IllegalArgumentException => logger.debug(s"Could not create date format from format [${a.pattern}] and locale [${a.locale}] - ${e.getMessage}")
         inputVar
     }
   }
