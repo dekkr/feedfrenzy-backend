@@ -40,7 +40,11 @@ libraryDependencies ++= {
 
 //ScoverageSbtPlugin.ScoverageKeys.coverageEnabled := true
 
-ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages := "BuildInfo.scala"
+import scoverage.ScoverageSbtPlugin.ScoverageKeys._
+
+coverageExcludedPackages := "BuildInfo.scala"
+coverageMinimum := 75
+coverageFailOnMinimum := true
 
 Revolver.settings
 
@@ -155,4 +159,6 @@ mappings in Universal := {
 scriptClasspath := Seq((assemblyJarName in assembly).value)
 
 
-parallelExecution in Test := false
+//parallelExecution in Test := false
+
+cancelable in Global := true

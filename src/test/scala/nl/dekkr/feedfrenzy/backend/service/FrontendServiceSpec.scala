@@ -1,6 +1,7 @@
 package nl.dekkr.feedfrenzy.backend.service
 
 import akka.event.Logging
+import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.testkit.ScalatestRouteTest
@@ -15,8 +16,6 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
 
   val contentTypeHeader = RawHeader("Content-type", "application/json")
 
-  val travisError = "Test failed silently (Is okay when running on Travis CI)"
-
   val splitAction = Action(
     actionType = "split",
     order = 1,
@@ -29,65 +28,46 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
     padTime = None
   )
 
+  Http().bindAndHandle(routes, interface = API_INTERFACE, port = API_PORT)
 
   "FrontendService" should {
 
     "return a list of article links" in {
       val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(false))
-      Post("/v1/createArticleLinks", requestBody) ~> routes ~> check {
-        if (status != InternalServerError) {
-          status shouldEqual OK
-          responseAs[ArticleLinks].urls.length should be > 0
-        } else {
-          info(travisError)
-        }
+      Post(s"http://localhost:$API_PORT/v1/createArticleLinks", requestBody) ~> routes ~> check {
+        status shouldEqual OK
+        responseAs[ArticleLinks].urls.length should be > 0
       }
     }
 
     "return a list of raw variable" in {
       val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(true))
       Post("/v1/createArticleLinks", requestBody) ~> routes ~> check {
-        if (status != InternalServerError) {
-          status shouldEqual OK
-          responseAs[RawVariables].variables.length shouldBe 0
-        } else {
-          info(travisError)
-        }
+        status shouldEqual OK
+        responseAs[RawVariables].variables.length shouldBe 0
       }
     }
 
     "return a bad request on a empty / incorrect request" in {
       val emptyUrlRequest = ArticleLinksRequest(url = "none", actions = List.empty[Action], raw = Some(false))
       Post("/v1/createArticleLinks", emptyUrlRequest) ~> routes ~> check {
-        if (status != InternalServerError) {
-          status shouldEqual BadRequest
-        } else {
-          info(travisError)
-        }
+        status shouldEqual BadRequest
       }
     }
 
     "return an article" in {
       val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(false))
       Post("/v1/createArticle", requestBody) ~> addHeader(contentTypeHeader) ~> routes ~> check {
-        if (status != InternalServerError) {
-          status shouldEqual OK
-          responseAs[Article] shouldEqual Article("http://google.com", "", None, "", None, None, List())
-        } else {
-          info(travisError)
-        }
+        status shouldEqual OK
+        responseAs[Article] shouldEqual Article("http://google.com", "", None, "", None, None, List())
       }
     }
 
     "return the raw article variables" in {
       val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(true))
       Post("/v1/createArticle", requestBody) ~> addHeader(contentTypeHeader) ~> routes ~> check {
-        if (status != InternalServerError) {
-          status shouldEqual OK
-          responseAs[RawVariables].variables.length shouldBe 1
-        } else {
-          info(travisError)
-        }
+        status shouldEqual OK
+        responseAs[RawVariables].variables.length shouldBe 1
       }
     }
 

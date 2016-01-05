@@ -25,7 +25,7 @@ class CssSelectorAction extends BaseAction {
   private def extractCss(input: String, updatedTemplate: String, includeParentHtml: Boolean): List[String] = {
     if (input != null && input.length > 0) {
       Jsoup.parse(input).select(updatedTemplate) match {
-        case contentList if contentList != null =>
+        case contentList if contentList != null && contentList.size > 0 =>
           if (includeParentHtml) {
             contentList.map(_.outerHtml()).toList
           } else {
