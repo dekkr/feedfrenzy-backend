@@ -1,18 +1,28 @@
 package nl.dekkr.feedfrenzy.backend.service
 
+import java.io.IOException
+
 import akka.event.Logging
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.RawHeader
-import akka.http.scaladsl.testkit.ScalatestRouteTest
+import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
+import akka.stream.AbruptTerminationException
 import nl.dekkr.feedfrenzy.backend.model._
+import scala.concurrent.duration._
 import nl.dekkr.feedfrenzy.backend.services.FrontendService
 import nl.dekkr.feedfrenzy.backend.test.TestHelper
 import org.scalatest.{Matchers, WordSpec}
+import scala.language.postfixOps
+
+//import
 
 class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest with FrontendService with TestHelper {
 
   override val logger = Logging(system, getClass)
+
+  implicit val routeTestTimeout = RouteTestTimeout(5.second)
+
 
   val contentTypeHeader = RawHeader("Content-type", "application/json")
 
@@ -70,6 +80,22 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
         responseAs[RawVariables].variables.length shouldBe 1
       }
     }
+
+    "return an bad request when the url is invalid" in {
+      val requestBody = ArticleLinksRequest(url = "httpx://google.com", actions = List(splitAction), raw = Some(false))
+      Post("/v1/createArticle", requestBody) ~> addHeader(contentTypeHeader) ~> routes ~> check {
+        status shouldEqual BadRequest
+        responseAs[String] shouldEqual "httpx://google.com: incorrect url"
+      }
+    }
+
+    "return an internal server error on non-existing host" in {
+      val requestBody = ArticleLinksRequest(url = "http://notfound.dekkr.nl", actions = List(splitAction), raw = Some(false))
+        Post("/v1/createArticle", requestBody) ~> addHeader(contentTypeHeader) ~> routes ~> check {
+          status shouldEqual InternalServerError
+        }
+    }
+
 
     "leave GET requests to other paths unhandled" in {
       Get("/v1/nothing") ~> routes ~> check {
