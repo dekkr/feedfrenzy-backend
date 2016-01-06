@@ -1,4 +1,7 @@
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
+[![Build Status](https://travis-ci.org/dekkr/feedfrenzy-backend.svg?branch=master)](https://travis-ci.org/dekkr/feedfrenzy-backend)
 [![Coverage Status](https://coveralls.io/repos/dekkr/feedfrenzy-backend/badge.svg?branch=master&service=github)](https://coveralls.io/github/dekkr/feedfrenzy-backend?branch=master)
+
 # feedfrenzy-backend
 
 Stateless microservice, responsible for parsing web pages and structuring the data.
