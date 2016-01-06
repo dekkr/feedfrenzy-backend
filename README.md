@@ -1,3 +1,4 @@
+[![Coverage Status](https://coveralls.io/repos/dekkr/feedfrenzy-backend/badge.svg?branch=master&service=github)](https://coveralls.io/github/dekkr/feedfrenzy-backend?branch=master)
 # feedfrenzy-backend
 
 Stateless microservice, responsible for parsing web pages and structuring the data.
