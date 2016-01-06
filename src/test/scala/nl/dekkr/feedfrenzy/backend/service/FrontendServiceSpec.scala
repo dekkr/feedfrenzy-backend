@@ -1,28 +1,23 @@
 package nl.dekkr.feedfrenzy.backend.service
 
-import java.io.IOException
-
 import akka.event.Logging
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
-import akka.stream.AbruptTerminationException
 import nl.dekkr.feedfrenzy.backend.model._
-import scala.concurrent.duration._
 import nl.dekkr.feedfrenzy.backend.services.FrontendService
-import nl.dekkr.feedfrenzy.backend.test.TestHelper
+import nl.dekkr.feedfrenzy.backend.test.{MockPageFetcher, TestHelper}
 import org.scalatest.{Matchers, WordSpec}
-import scala.language.postfixOps
 
-//import
+import scala.concurrent.duration._
+import scala.language.postfixOps
 
 class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest with FrontendService with TestHelper {
 
   override val logger = Logging(system, getClass)
 
   implicit val routeTestTimeout = RouteTestTimeout(5.second)
-
 
   val contentTypeHeader = RawHeader("Content-type", "application/json")
 
@@ -38,13 +33,16 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
     padTime = None
   )
 
+  val pf = new MockPageFetcher
+  pf.startApi()
+
   Http().bindAndHandle(routes, interface = API_INTERFACE, port = API_PORT)
 
   "FrontendService" should {
 
     "return a list of article links" in {
       val requestBody = ArticleLinksRequest(url = "http://google.com", actions = List(splitAction), raw = Some(false))
-      Post(s"http://localhost:$API_PORT/v1/createArticleLinks", requestBody) ~> routes ~> check {
+      Post("/v1/createArticleLinks", requestBody) ~> routes ~> check {
         status shouldEqual OK
         responseAs[ArticleLinks].urls.length should be > 0
       }
@@ -91,11 +89,10 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
 
     "return an internal server error on non-existing host" in {
       val requestBody = ArticleLinksRequest(url = "http://notfound.dekkr.nl", actions = List(splitAction), raw = Some(false))
-        Post("/v1/createArticle", requestBody) ~> addHeader(contentTypeHeader) ~> routes ~> check {
-          status shouldEqual InternalServerError
-        }
+      Post("/v1/createArticle", requestBody) ~> addHeader(contentTypeHeader) ~> routes ~> check {
+        status shouldEqual InternalServerError
+      }
     }
-
 
     "leave GET requests to other paths unhandled" in {
       Get("/v1/nothing") ~> routes ~> check {
