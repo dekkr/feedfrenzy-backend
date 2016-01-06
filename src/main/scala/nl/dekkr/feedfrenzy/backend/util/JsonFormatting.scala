@@ -17,7 +17,6 @@ trait JsonFormatting extends akka.http.scaladsl.marshallers.sprayjson.SprayJsonS
   implicit val article = jsonFormat7(Article.apply)
   implicit val rawVariable = jsonFormat2(RawVariable.apply)
   implicit val rawVariables = jsonFormat2(RawVariables.apply)
-  implicit val newContent = jsonFormat1(NewContent.apply)
 
   implicit object TypeOfActionJsonFormat extends RootJsonFormat[TypeOfAction] {
     override def write(toa: TypeOfAction) = JsString(TypeOfAction.typeOfAction2String(toa))
@@ -27,7 +26,6 @@ trait JsonFormatting extends akka.http.scaladsl.marshallers.sprayjson.SprayJsonS
       case _ => throw new DeserializationException("Invalid action in Json")
     }
   }
-
 
   implicit object OffsetDateTimeJsonFormat extends RootJsonFormat[OffsetDateTime] {
     override def write(obj: OffsetDateTime) = JsString(obj.format(ISO_OFFSET_DATE_TIME))

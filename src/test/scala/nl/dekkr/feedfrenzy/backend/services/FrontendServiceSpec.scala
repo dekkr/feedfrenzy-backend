@@ -1,4 +1,4 @@
-package nl.dekkr.feedfrenzy.backend.service
+package nl.dekkr.feedfrenzy.backend.services
 
 import akka.event.Logging
 import akka.http.scaladsl.Http
@@ -6,7 +6,6 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
 import nl.dekkr.feedfrenzy.backend.model._
-import nl.dekkr.feedfrenzy.backend.services.FrontendService
 import nl.dekkr.feedfrenzy.backend.test.{MockPageFetcher, TestHelper}
 import org.scalatest.{Matchers, WordSpec}
 

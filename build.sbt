@@ -43,7 +43,7 @@ libraryDependencies ++= {
 import scoverage.ScoverageSbtPlugin.ScoverageKeys._
 
 coverageExcludedPackages := "BuildInfo.scala"
-coverageMinimum := 70
+coverageMinimum := 80
 coverageFailOnMinimum := true
 
 Revolver.settings
