@@ -77,5 +77,10 @@ class MockPageFetcher {
     }).run()
   }
 
+  def stopApi(): Unit = {
+    system.shutdown()
+    system.awaitTermination()
+  }
 
+  def url = s"http://${config.getString(s"$CONFIG_BASE.interface")}:${config.getString(s"$CONFIG_BASE.port")}${config.getString(s"$CONFIG_BASE.uri")}"
 }
