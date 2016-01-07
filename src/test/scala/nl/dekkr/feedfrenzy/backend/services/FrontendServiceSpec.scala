@@ -7,12 +7,12 @@ import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
 import nl.dekkr.feedfrenzy.backend.model._
 import nl.dekkr.feedfrenzy.backend.test.{MockPageFetcher, TestHelper}
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{BeforeAndAfter, Matchers, WordSpec}
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest with FrontendService with TestHelper {
+class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest with FrontendService with TestHelper with BeforeAndAfter {
 
   override val logger = Logging(system, getClass)
 
@@ -33,7 +33,15 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
   )
 
   val pf = new MockPageFetcher
-  pf.startApi()
+
+  override def beforeAll() {
+    pf.startApi()
+  }
+
+  override def afterAll() {
+    pf.stopApi()
+  }
+
 
   Http().bindAndHandle(routes, interface = API_INTERFACE, port = API_PORT)
 
@@ -100,5 +108,6 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
     }
 
   }
+
 
 }
