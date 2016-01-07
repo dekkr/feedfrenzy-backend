@@ -42,7 +42,7 @@ libraryDependencies ++= {
 
 import scoverage.ScoverageSbtPlugin.ScoverageKeys._
 
-coverageExcludedPackages := "BuildInfo.scala"
+coverageExcludedPackages := ".*BuildInfo.*;.*BootedCore.*;.*Boot.*"
 coverageMinimum := 80
 coverageFailOnMinimum := true
 

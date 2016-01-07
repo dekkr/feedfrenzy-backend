@@ -22,7 +22,7 @@ class BackendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest 
 
   val backend = new BackendService(pf.url)
 
-  "Backend service" should {
+  "BackendService" should {
     "retrieve an article" in {
       val article = backend.getArticle(PageUrl(url = "http://google.com"))
       article match {
@@ -30,15 +30,6 @@ class BackendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest 
         case _ => fail("Incorrect response")
       }
     }
-
-//    "fail retrieving an article for an incorrect url" in {
-//      val article = backend.getArticle(PageUrl(url = "http://notfound.dekkr.nl"))
-//      article match {
-//        case x: NewContent => fail(s"Incorrect response: ${x.body}")
-//        case _ =>
-//      }
-//    }
-
 
     "retrieve a set of articles" in {
       val articles = backend.getArticles(PageUrl(url = "http://google.com"))

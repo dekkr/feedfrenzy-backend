@@ -7,6 +7,5 @@ package nl.dekkr.feedfrenzy.backend.actors
  */
 trait CoreActors {
   this: Core =>
-  //implicit val persistence = system.actorOf(Props[PersistenceActor], "persistence")
 
 }
