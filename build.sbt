@@ -37,10 +37,7 @@ libraryDependencies ++= {
   )
 }
 
-
-
-
-import scoverage.ScoverageSbtPlugin.ScoverageKeys._
+testOptions in Test += Tests.Argument("-oD")
 
 coverageExcludedPackages := ".*BuildInfo.*;.*BootedCore.*;.*Boot.*"
 coverageMinimum := 80

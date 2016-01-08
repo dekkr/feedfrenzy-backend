@@ -13,10 +13,9 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Flow, Sink, Source}
-import nl.dekkr.feedfrenzy.backend.extractor.{ArticleLinksExtractor, ArticleExtractor}
+import nl.dekkr.feedfrenzy.backend.extractor.{ArticleExtractor, ArticleLinksExtractor}
 import nl.dekkr.feedfrenzy.backend.model._
 import nl.dekkr.feedfrenzy.backend.util.JsonFormatting
-
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -73,7 +72,7 @@ trait FrontendService extends JsonFormatting with Configuration {
         case BadRequest => Future.successful(Left(s"$url: incorrect url"))
         case _ => Unmarshal(response.entity).to[String].flatMap { entity =>
           val error = s"Pagefetcher request failed with status code ${response.status} and entity $entity"
-          logger.error(error)
+          logger.info(error)
           Future.failed(new IOException(error))
         }
       }

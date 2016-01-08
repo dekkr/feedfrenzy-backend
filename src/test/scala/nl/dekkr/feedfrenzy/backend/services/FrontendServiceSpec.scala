@@ -7,19 +7,17 @@ import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
 import nl.dekkr.feedfrenzy.backend.model._
 import nl.dekkr.feedfrenzy.backend.test.{MockPageFetcher, TestHelper}
-import org.scalatest.{BeforeAndAfter, Matchers, WordSpec}
+import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest with FrontendService with TestHelper with BeforeAndAfter {
+class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest with FrontendService with TestHelper {
 
   override val logger = Logging(system, getClass)
-
+  override val PAGEFETCHER_PORT = 9999
   implicit val routeTestTimeout = RouteTestTimeout(5.second)
-
   val contentTypeHeader = RawHeader("Content-type", "application/json")
-
   val splitAction = Action(
     actionType = "split",
     order = 1,
@@ -31,17 +29,7 @@ class FrontendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest
     pattern = None,
     padTime = None
   )
-
-  val pf = new MockPageFetcher
-
-  override def beforeAll() {
-    pf.startApi()
-  }
-
-  override def afterAll() {
-    pf.stopApi()
-  }
-
+  val pf = new MockPageFetcher(PAGEFETCHER_PORT)
 
   Http().bindAndHandle(routes, interface = API_INTERFACE, port = API_PORT)
 

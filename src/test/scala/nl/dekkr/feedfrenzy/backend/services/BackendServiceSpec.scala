@@ -3,22 +3,14 @@ package nl.dekkr.feedfrenzy.backend.services
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import nl.dekkr.feedfrenzy.backend.model.{NewContent, PageUrl}
 import nl.dekkr.feedfrenzy.backend.test.MockPageFetcher
-import org.scalatest.{BeforeAndAfter, Matchers, WordSpec}
+import org.scalatest.{Matchers, WordSpec}
 
 
-class BackendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest with BeforeAndAfter {
+class BackendServiceSpec extends WordSpec with Matchers with ScalatestRouteTest with Configuration {
 
 
-  val pf = new MockPageFetcher
-
-  override def beforeAll() {
-    pf.startApi()
-  }
-
-  override def afterAll() {
-    pf.stopApi()
-  }
-
+  override val PAGEFETCHER_PORT = 9091
+  val pf = new MockPageFetcher(PAGEFETCHER_PORT)
 
   val backend = new BackendService(pf.url)
 
