@@ -31,6 +31,7 @@ libraryDependencies ++= {
     "org.jsoup" % "jsoup" % "1.8.3",
     "org.scalaj" %% "scalaj-http" % "1.1.5",
     "org.specs2" %% "specs2-core" % "3.6.5" % "test",
+    "com.github.nikita-volkov" % "sext" % "0.2.4",
     "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion,
     "com.typesafe.scala-logging" % "scala-logging-slf4j_2.11" % "2.1.2",
     "ch.qos.logback" % "logback-classic" % logbackVersion
