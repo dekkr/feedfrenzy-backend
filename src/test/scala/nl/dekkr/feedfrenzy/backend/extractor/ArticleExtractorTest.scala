@@ -85,7 +85,7 @@ class ArticleExtractorTest extends FlatSpecLike with TestHelper {
 
     val otherActions = List(cssParentSelectionAction, replaceAction, cssRemoveAction, templateAction)
 
-    intercept[NoSuchMethodException](AE.getRaw(dummyUrl, startHtml, otherActions))
+    intercept[ActionException](AE.getRaw(dummyUrl, startHtml, otherActions))
   }
 
 
