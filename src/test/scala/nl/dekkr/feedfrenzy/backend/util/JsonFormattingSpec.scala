@@ -1,12 +1,12 @@
 package nl.dekkr.feedfrenzy.backend.util
 
-import java.time.OffsetDateTime
-
 import org.scalatest.{Matchers, WordSpec}
-import spray.json._
 
 
-class JsonFormattingSpec  extends WordSpec with Matchers with JsonFormatting {
+class JsonFormattingSpec extends WordSpec with Matchers {
+
+  import nl.dekkr.feedfrenzy.backend.util.JsonFormatting._
+  import spray.json._
 
   "JsonFormatting" should {
     "format OffsetDateTime" in {

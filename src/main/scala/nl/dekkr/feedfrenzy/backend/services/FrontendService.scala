@@ -13,14 +13,14 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Flow, Sink, Source}
-import nl.dekkr.feedfrenzy.backend.extractor.{ArticleExtractor, ArticleLinksExtractor}
+import nl.dekkr.feedfrenzy.backend.extractor.{ArticleExtractor, ArticleLinksExtractor, ArticleListExtractor}
 import nl.dekkr.feedfrenzy.backend.model._
-import nl.dekkr.feedfrenzy.backend.util.JsonFormatting
+import nl.dekkr.feedfrenzy.backend.util.JsonFormatting._
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
+trait FrontendService extends Configuration {
 
-trait FrontendService extends JsonFormatting with Configuration {
   lazy val pageFetcherFlow: Flow[HttpRequest, HttpResponse, Any] =
     Http().outgoingConnection(PAGEFETCHER_INTERFACE, PAGEFETCHER_PORT)
   implicit val system: ActorSystem
@@ -57,7 +57,21 @@ trait FrontendService extends JsonFormatting with Configuration {
               }
             }
           }
+          } ~
+        pathPrefix("createArticleList") {
+          (post & entity(as[ArticleListRequest])) { request =>
+            complete {
+              fetchPage(request.url).map[ToResponseMarshallable] {
+                case Right(content : String) =>
+                  if (request.raw.isEmpty || request.raw.contains(false))
+                    new ArticleListExtractor().getList(request.url,content,request.blockActions, request.articleActions)
+                  else
+                    new ArticleListExtractor().getRawArticles(request.url,content,request.blockActions, request.articleActions)
+                case Left(errorMessage) => BadRequest -> errorMessage
+              }
+            }
           }
+        }
 
       }
     }

@@ -9,14 +9,18 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 
 
-trait JsonFormatting extends akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport {
+object JsonFormatting extends akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport  {
+
   implicit val action = jsonFormat9(Action.apply)
-  implicit val articleLinksRequest = jsonFormat3(ArticleLinksRequest.apply)
-  implicit val articleRequest = jsonFormat3(ArticleRequest.apply)
-  implicit val articleLinks = jsonFormat1(ArticleLinks.apply)
-  implicit val article = jsonFormat7(Article.apply)
-  implicit val rawVariable = jsonFormat2(RawVariable.apply)
-  implicit val rawVariables = jsonFormat2(RawVariables.apply)
+
+  implicit val articleLinksRequest: RootJsonFormat[ArticleLinksRequest] = jsonFormat3(ArticleLinksRequest)
+  implicit val articleRequest: RootJsonFormat[ArticleRequest] = jsonFormat3(ArticleRequest)
+  implicit val articleListRequest: RootJsonFormat[ArticleListRequest] = jsonFormat4(ArticleListRequest)
+  implicit val articleLinks: RootJsonFormat[ArticleLinks] = jsonFormat1(ArticleLinks)
+
+  implicit val article: RootJsonFormat[Article] = jsonFormat7(Article)
+  implicit val rawVariable: RootJsonFormat[RawVariable] = jsonFormat2(RawVariable)
+  implicit val rawVariables: RootJsonFormat[RawVariables] = jsonFormat2(RawVariables)
 
   implicit object TypeOfActionJsonFormat extends RootJsonFormat[TypeOfAction] {
     override def write(toa: TypeOfAction) = JsString(TypeOfAction.typeOfAction2String(toa))
