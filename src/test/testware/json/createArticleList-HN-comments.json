@@ -1,0 +1,43 @@
+{
+  "url": "https://news.ycombinator.com/newcomments",
+  "blockActions": [{
+    "order": 1,
+    "actionType": "css-selector",
+    "template": "table.itemlist tbody td.default"
+  }],
+  "articleActions": [{
+    "order": 1,
+    "actionType": "css-selector",
+    "template": "span.storyon",
+    "outputVariable": "anchor"
+  }, {
+    "order": 2,
+    "actionType": "css-selector",
+    "template": "span.storyon a",
+    "outputVariable": "title"
+  }, {
+    "order": 3,
+    "actionType": "attribute",
+    "template": "href",
+    "inputVariable": "anchor",
+    "outputVariable": "uid"
+  }, {
+    "order": 4,
+    "actionType": "css-selector",
+    "template": "span.c00",
+    "outputVariable": "content"
+  }, {
+    "order": 5,
+    "actionType": "css-remove",
+    "template": "div.reply",
+    "inputVariable": "content",
+    "outputVariable": "content"
+  }, {
+    "order": 6,
+    "actionType": "replace",
+    "template": "<span> </span>",
+    "replaceWith" : "",
+    "inputVariable": "content",
+    "outputVariable": "content"
+  }]
+}
