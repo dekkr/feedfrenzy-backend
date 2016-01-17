@@ -62,6 +62,34 @@ Result
 }
 ```
 
+Parse an page to get an article list
+
+``` bash
+ http -b POST http://localhost:8029/v1/createArticleList < ./src/test/testware/json/createArticleList-HN-comments.json
+ ```
+ 
+Result
+ 
+```json
+[{
+    "content": "Win8 and Win10 are objectively worse than 7.\n \n",
+    "tags": [],
+    "title": "\"...customers are likely to see regressions with W...",
+    "uid": "https://news.ycombinator.com/item?id=10918462"
+}, {
+    "content": "Leave the pun threads on Reddit, please.\n \n",
+    "tags": [],
+    "title": "Why London Underground stopped people walking up t...",
+    "uid": "https://news.ycombinator.com/item?id=10916704"
+}, {
+    "content": "Yes, I know what a straddle is, but it has almost nothing to do with the initial claim: \"Its actual value is probably unchanged.\"\n \n",
+    "tags": [],
+    "title": "Etsy stock has lost 76% of its value in 9 months",
+    "uid": "https://news.ycombinator.com/item?id=10912225"
+}
+]
+```
+
 
 ##Docker images
 
