@@ -16,6 +16,7 @@ import akka.stream.scaladsl.{Flow, Sink, Source}
 import nl.dekkr.feedfrenzy.backend.extractor.{ArticleExtractor, ArticleLinksExtractor, ArticleListExtractor}
 import nl.dekkr.feedfrenzy.backend.model._
 import nl.dekkr.feedfrenzy.backend.util.JsonFormatting._
+import spray.json.DefaultJsonProtocol._
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
