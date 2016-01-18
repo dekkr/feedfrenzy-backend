@@ -40,9 +40,9 @@ libraryDependencies ++= {
 
 testOptions in Test += Tests.Argument("-oD")
 
-coverageExcludedPackages := ".*BuildInfo.*;.*BootedCore.*;.*Boot.*"
-coverageMinimum := 80
-coverageFailOnMinimum := true
+//coverageExcludedPackages := ".*BuildInfo.*;.*BootedCore.*;.*Boot.*"
+//coverageMinimum := 80
+//coverageFailOnMinimum := true
 
 Revolver.settings
 
