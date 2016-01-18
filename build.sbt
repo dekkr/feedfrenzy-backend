@@ -1,7 +1,7 @@
 
 lazy val commonSettings = Seq(
   organization := "dekkR projects",
-  version := "0.1.1",
+  version := "0.2.0",
   scalaVersion := "2.11.7"
 )
 
@@ -62,7 +62,7 @@ licenses := Seq(
 
 bintrayOrganization := Some("dekkr")
 
-bintrayRepository  := "feedfrenzy-backend"
+bintrayRepository  := "feedr"
 
 bintrayPackageLabels := Seq("microservice", "scraping")
 
@@ -156,7 +156,5 @@ mappings in Universal := {
 // the bash scripts classpath only needs the fat jar
 scriptClasspath := Seq((assemblyJarName in assembly).value)
 
-
-//parallelExecution in Test := false
 
 cancelable in Global := true
